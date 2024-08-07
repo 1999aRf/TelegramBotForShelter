@@ -9,12 +9,13 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import shelter.bot.botshelter.Listener.Interface.TelegramLongPolling;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
 import java.util.List;
 
 @Service
-public class BotListener implements UpdatesListener {
+public class BotListener implements TelegramLongPolling, UpdatesListener {
     private final CommandHandlerService commandHandlerService;
 
     private Logger logger = LoggerFactory.getLogger(BotListener.class);
