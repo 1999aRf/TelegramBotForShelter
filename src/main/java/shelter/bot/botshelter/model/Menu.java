@@ -64,10 +64,7 @@ public class Menu {
     private List<KeyboardRow> makeKeyboard(List<String> buttonTexts) {
         KeyboardRow buttons = new KeyboardRow();
         buttons.addAll(buttonTexts);
-        List<KeyboardRow> list = new ArrayList<>(List.of(
-                buttons
-        ));
-        return list;
+        return List.of(buttons);
     }
 
 }
