@@ -2,8 +2,9 @@ package shelter.bot.botshelter.model;
 
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.*;
@@ -19,6 +20,19 @@ import java.util.*;
 * */
 @Component
 public class Menu {
+
+    // Метод для создания сообщения с кнопкой "Start"
+    public SendMessage createStartMenu(Long chatId) {
+        // Создаем клавиатуру с одной строкой и одной кнопкой "Start"
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(
+                new String[]{"Start"}) // одна строка с одной кнопкой
+                .resizeKeyboard(true)   // Клавиатура подстраивается под размер экрана
+                .oneTimeKeyboard(true); // Клавиатура исчезает после использования
+
+        // Возвращаем сообщение с клавиатурой
+        return new SendMessage(chatId, "Нажмите кнопку 'Start' для начала работы.")
+                .replyMarkup(keyboardMarkup);
+    }
 
     public static List<String> MAIN_MENU_BUTTONS_TEXTS = new ArrayList<>(List.of(
             "Информация о приюте",
@@ -52,13 +66,13 @@ public class Menu {
     ));
 
     // метод создания кнопок меню в оболочке отправляемого сообщения
-    public SendMessage makeMenuMessage(Long chatId, String txt, List<String> buttons) {
-        SendMessage sm = SendMessage.builder()
-                .chatId(chatId.toString())
-                .text(txt)
-                .replyMarkup(new ReplyKeyboardMarkup(makeKeyboard(buttons))).build();
-        return sm;
-    }
+//    public SendMessage makeMenuMessage(Long chatId, String txt, List<String> buttons) {
+//        SendMessage sm = SendMessage.builder()
+//                .chatId(chatId.toString())
+//                .text(txt)
+//                .replyMarkup(new ReplyKeyboardMarkup(makeKeyboard(buttons))).build();
+//        return sm;
+//    }
 
     // приватный метод создания листа строк для
     private List<KeyboardRow> makeKeyboard(List<String> buttonTexts) {
