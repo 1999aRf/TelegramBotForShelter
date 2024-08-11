@@ -2,6 +2,8 @@ package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 public class Client {
     @Id
@@ -61,4 +63,27 @@ public class Client {
 //    public void setAdoptedPets(List<Pet> adoptedPets) {
 //        this.adoptedPets = adoptedPets;
 //    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return Objects.equals(id, client.id) && Objects.equals(chatId, client.chatId) && Objects.equals(clientName, client.clientName) && Objects.equals(contactNumber, client.contactNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, chatId, clientName, contactNumber);
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", chatId=" + chatId +
+                ", clientName='" + clientName + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                '}';
+    }
 }
