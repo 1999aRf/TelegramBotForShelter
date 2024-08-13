@@ -1,4 +1,4 @@
-package shelter.bot.botshelter.Listener.Interface;
+package shelter.bot.botshelter.listener.Interface;
 
 import com.pengrad.telegrambot.model.Update;
 

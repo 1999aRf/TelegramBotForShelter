@@ -9,7 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import shelter.bot.botshelter.Listener.Interface.TelegramLongPolling;
+import shelter.bot.botshelter.listener.Interface.TelegramLongPolling;
 import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
