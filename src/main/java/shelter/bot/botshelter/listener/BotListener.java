@@ -1,4 +1,4 @@
-package shelter.bot.botshelter.listener;
+package shelter.bot.botshelter.Listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -9,7 +9,8 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import shelter.bot.botshelter.listener.Interface.TelegramLongPolling;
+import shelter.bot.botshelter.Listener.Interface.TelegramLongPolling;
+import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
 import java.util.List;
@@ -22,9 +23,12 @@ public class BotListener implements TelegramLongPolling, UpdatesListener {
 
     private final TelegramBot telegramBot;
 
-    public BotListener(CommandHandlerService commandHandlerService, TelegramBot telegramBot) {
+    private final Menu menu;
+
+    public BotListener(CommandHandlerService commandHandlerService, TelegramBot telegramBot, Menu menu) {
         this.commandHandlerService = commandHandlerService;
         this.telegramBot = telegramBot;
+        this.menu = menu;
     }
 
     @PostConstruct
@@ -51,12 +55,25 @@ public class BotListener implements TelegramLongPolling, UpdatesListener {
         Long chatId = update.message().chat().id();
         String text = update.message().text();
 
-        String rs = CommandHandlerService.handleCommand(chatId, text);
-        sendMessage(chatId, rs);
+        // Если это команда /start, обработаем её
+        if ("/start".equals(text)) {
+            String responseText = commandHandlerService.handleCommand(chatId, text);
+            sendMessage(chatId, responseText);
+
+        } else {
+            // Обработка других команд
+            String responseText = commandHandlerService.handleCommand(chatId, text);
+            sendMessage(chatId, responseText);
+        }
     }
 
-    private void sendMessage(Long chatId, String message) {
-        SendMessage sendMessage = new SendMessage(chatId, message);
+    // Универсальный метод для отправки сообщения
+    private void sendMessage(Long chatId, String messageText) {
+        SendMessage sendMessage = new SendMessage(chatId, messageText);
+        sendMessage(sendMessage);
+    }
+
+    private void sendMessage(SendMessage sendMessage) {
         SendResponse response = telegramBot.execute(sendMessage);
         if (!response.isOk()) {
             logger.error("Error during sending message: {}", response.description());
