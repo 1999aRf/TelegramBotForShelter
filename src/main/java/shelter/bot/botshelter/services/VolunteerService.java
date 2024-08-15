@@ -2,7 +2,10 @@ package shelter.bot.botshelter.services;
 
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.model.Volunteer;
-import shelter.bot.botshelter.repository.VolunteerRepository;
+import shelter.bot.botshelter.repositories.VolunteerRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VolunteerService {
@@ -16,8 +19,8 @@ public class VolunteerService {
         return repository.save(volunteer);
     }
 
-    public Volunteer findById(long id) {
-        return repository.findById(id).get();
+    public Optional<Volunteer> findById(long id) {
+        return repository.findById(id);
     }
 
     public Volunteer edit(Volunteer volunteer) {
@@ -26,5 +29,9 @@ public class VolunteerService {
 
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public Optional<List<Volunteer>> findAll() {
+        return Optional.ofNullable(repository.findAll());
     }
 }

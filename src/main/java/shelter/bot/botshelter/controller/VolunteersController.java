@@ -6,9 +6,11 @@ import shelter.bot.botshelter.model.Volunteer;
 import shelter.bot.botshelter.services.VolunteerService;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("volunteers")
+@RequestMapping("api/volunteers")
 public class VolunteersController {
 
     private final VolunteerService service;
@@ -35,11 +37,14 @@ public class VolunteersController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Volunteer> findById(@PathVariable Long id) {
-        Volunteer volunteer = service.findById(id);
-        if (volunteer != null) {
-            return ResponseEntity.ok(volunteer);
-        }
-        return ResponseEntity.notFound().build();
+        Optional<Volunteer> volunteer = service.findById(id);
+        return volunteer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Volunteer>> findAll() {
+        Optional<List<Volunteer>> optional = service.findAll();
+        return optional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

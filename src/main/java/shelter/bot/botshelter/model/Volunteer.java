@@ -18,10 +18,10 @@ public class Volunteer {
         @Column(name = "name", nullable = false)
     private String name;
 
-       @Column(name = "contacts", nullable = false)
-    private int contacts;
+       @Column(name = "contacts", nullable = true)
+    private String contacts;
 
-    public Volunteer(long chat_id, String name, int contacts) {
+    public Volunteer(long chat_id, String name, String contacts) {
         this.chat_id = chat_id;
         this.name = name;
         this.contacts = contacts;
@@ -50,11 +50,11 @@ public class Volunteer {
         this.name = name;
     }
 
-    public int getContacts() {
+    public String getContacts() {
         return contacts;
     }
 
-    public void setContacts(int contacts) {
+    public void setContacts(String contacts) {
         this.contacts = contacts;
     }
 
@@ -73,11 +73,8 @@ public class Volunteer {
 
     @Override
     public String toString() {
-        return "Volunteer{" +
-                "id=" + id +
-                ", chat_id=" + chat_id +
-                ", name='" + name + '\'' +
-                ", contacts=" + contacts +
-                '}';
+        return "Волонтер:" +
+                " имя - '" + name + '\'' +
+                "\n, номер -" + contacts;
     }
 }

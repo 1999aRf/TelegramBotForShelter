@@ -5,22 +5,34 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name="clients")
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "chat_id",nullable = false, unique = true)
     private Long chatId;
 
-    @Column(nullable = false)
+    @Column(name = "client_name",nullable = true)
     private String clientName;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "contact_number",nullable = true, unique = true)
     private String contactNumber;
 
+    public Client(Long chatId, String clientName, String contactNumber) {
+        this.chatId = chatId;
+        this.clientName = clientName;
+        this.contactNumber = contactNumber;
+    }
 
-// на будущее, сразу создал для питомцев.
+    public Client(Long chatId) {
+        this.chatId = chatId;
+    }
+
+    public Client() {
+    }
+    // на будущее, сразу создал для питомцев.
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Pet> adoptedPets;
 

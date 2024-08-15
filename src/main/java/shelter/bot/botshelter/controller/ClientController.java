@@ -28,7 +28,7 @@ public class ClientController {
         return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public List<Client> getAllClients() {
         return clientService.findAllClients();
     }

@@ -20,7 +20,7 @@ public class ClientService {
     }
 
     public Optional<Client> findByChatId(Long chatId) {
-        return clientRepository.findByChatId(chatId);
+        return Optional.ofNullable(clientRepository.findByChatId(chatId));
     }
 
     public List<Client> findAllClients() {

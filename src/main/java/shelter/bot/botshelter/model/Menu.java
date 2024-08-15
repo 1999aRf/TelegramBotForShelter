@@ -1,11 +1,16 @@
 package shelter.bot.botshelter.model;
 
 
-import org.springframework.stereotype.Component;
-import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import shelter.bot.botshelter.listener.BotListener;
+
 
 import java.util.*;
 
@@ -20,6 +25,7 @@ import java.util.*;
 * */
 @Component
 public class Menu {
+    private Logger logger = LoggerFactory.getLogger(Menu.class);
 
     // Метод для создания сообщения с кнопкой "Start"
     public SendMessage createStartMenu(Long chatId) {
@@ -34,51 +40,30 @@ public class Menu {
                 .replyMarkup(keyboardMarkup);
     }
 
-    public static List<String> MAIN_MENU_BUTTONS_TEXTS = new ArrayList<>(List.of(
-            "Информация о приюте",
-            "Как взять животное из приюта",
-            "Прислать отчет о питомце",
-            "Позвать волонтера"
-    ));
-    public static List<String> SUBMENU_NEW_USER= new ArrayList<>(List.of(
-            "Расписание и адрес приюта",
-            "Оформление пропуска и схема проезда",
-            "Техника безопасности",
-            "Запросить связь"
-    ));
-    public static List<String> SUBMENU_CONSULTATION = new ArrayList<>(List.of(
-            "Список животных",
-            "Правила знакомства и усыновления",
-            "Список необходимых документов",
-            "Рекомендации"
-    ));
-    public static List<String> SUBMENU_DOG_HANDLER = new ArrayList<>(List.of(
-            "Советы кинолога",
-            "Проверенные кинологи",
-            "Причины отказа",
-            "Запросить связь"
-    ));
-    public static List<String> SUBMENU_ADOPTION = new ArrayList<>(List.of(
-            "Транспортировка животного",
-            "Обустройство дома",
-            "Обустройство дома для взрослого питомца",
-            "Обустройство дома для питомца с ограниченными возможностями"
-    ));
 
-    // метод создания кнопок меню в оболочке отправляемого сообщения
-//    public SendMessage makeMenuMessage(Long chatId, String txt, List<String> buttons) {
-//        SendMessage sm = SendMessage.builder()
-//                .chatId(chatId.toString())
-//                .text(txt)
-//                .replyMarkup(new ReplyKeyboardMarkup(makeKeyboard(buttons))).build();
-//        return sm;
-//    }
+
+
+    /*// метод создания кнопок меню в оболочке отправляемого сообщения
+    public SendMessage makeMenuMessage(Long chatId, String txt, List<String> buttons) {
+        SendMessage sm = new SendMessage(chatId,txt)
+                .replyMarkup(new ReplyKeyboardMarkup(makeKeyboard(MAIN_MENU_BUTTONS_TEXTS)));
+        return sm;
+    }
 
     // приватный метод создания листа строк для
     private List<KeyboardRow> makeKeyboard(List<String> buttonTexts) {
         KeyboardRow buttons = new KeyboardRow();
         buttons.addAll(buttonTexts);
         return List.of(buttons);
+    }*/
+
+    public void sendMenu(Long chatId, String txt, String[][] buttons, TelegramBot bot) {
+        SendMessage msg = new SendMessage(chatId, txt)
+                .replyMarkup(new ReplyKeyboardMarkup(buttons, true, false, false));
+        SendResponse response = bot.execute(msg);
+        if (!response.isOk()) {
+            logger.info("{" + this.getClass() + "}:Меню не отправлено");
+        }
     }
 
 }
