@@ -9,7 +9,9 @@ import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
 import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
@@ -31,6 +33,9 @@ public class BotListener implements UpdatesListener {
     private final Menu menu;
 
     private ClientService clientService;
+
+    @Autowired
+    private TelegramBotConfiguration configuration;
 
     public BotListener(CommandHandlerService commandHandlerService, TelegramBot telegramBot, Menu menu, ClientService clientService) {
         this.commandHandlerService = commandHandlerService;
@@ -62,6 +67,7 @@ public class BotListener implements UpdatesListener {
 
         Long chatId = update.message().chat().id();
         String text = update.message().text();
+
 
         commandHandlerService.handleCommand(chatId,text);
 

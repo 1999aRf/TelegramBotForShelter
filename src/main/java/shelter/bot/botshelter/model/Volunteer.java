@@ -27,11 +27,22 @@ public class Volunteer {
         this.contacts = contacts;
     }
 
+    public Volunteer(Long id, long chat_id, String name, String contacts) {
+        this.id = id;
+        this.chat_id = chat_id;
+        this.name = name;
+        this.contacts = contacts;
+    }
+
     public Volunteer() {
     }
 
     public long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public long getChat_id() {
@@ -57,6 +68,8 @@ public class Volunteer {
     public void setContacts(String contacts) {
         this.contacts = contacts;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

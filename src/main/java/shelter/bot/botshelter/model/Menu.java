@@ -14,49 +14,51 @@ import shelter.bot.botshelter.listener.BotListener;
 
 import java.util.*;
 
-/*
-* С помощью данного класса создаются меню из набора кнопок.<br> Текст кнопок меню
-* формируется из статических коллекций строк. Они преобразуются в объекты класса (@code KeyboardRow)
-* с помощью метода (@code makeKeyboard).<br>
-* Для того, чтобы это меню отправить пользователю, используется метод (@code makeMenuMessage).
-* В нем формируется объект списка клавиш(меню), помещается в оболочку класса отправляемого пользователю
-* сообщения (@code SendMessage) и возвращается методом. Далее в классе-слушателе с помощью метода (@code execute())
-* будет отправлено пользователю.
+/**
+* С помощью данного класса создаются меню из набора кнопок.<br>
+ * Меню - это набор кнопок с командами, которые впоследствии необходимо будет обработать.
+ * Текст кнопок меню формируется из статических массивов строк.<br>
+ * Для того, чтобы отправить меню пользователю используется метод {@code sendMenu}, принимающий
+ * в качестве одного из аргументов одномерный или двумерный массив(если передать одномерный массив, то
+ * все команды будут умещены в одну строку, двумерный массив используется для размещения команд в
+ * несколько строк).
+ * @author KhasanovTR
 * */
 @Component
 public class Menu {
     private Logger logger = LoggerFactory.getLogger(Menu.class);
 
-    // Метод для создания сообщения с кнопкой "Start"
-    public SendMessage createStartMenu(Long chatId) {
-        // Создаем клавиатуру с одной строкой и одной кнопкой "Start"
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(
-                new String[]{"Start"}) // одна строка с одной кнопкой
-                .resizeKeyboard(true)   // Клавиатура подстраивается под размер экрана
-                .oneTimeKeyboard(true); // Клавиатура исчезает после использования
-
-        // Возвращаем сообщение с клавиатурой
-        return new SendMessage(chatId, "Нажмите кнопку 'Start' для начала работы.")
-                .replyMarkup(keyboardMarkup);
+    /**
+     * Метод предназначен для отправки меню пользователю. Аргументами выступают необходимые параметры
+     * для формирования объекта отправляемого сообщения {@code SendMessage}.Туда же помещается класс меню
+     * {@code ReplyKeyboardMarkup}. Отправляется сообщение вызовом статического метода
+     * {@code execute}
+     * @param chatId - идентификатор чата
+     * @param txt - сообщение( как сопроводительное письмо), которое отправляется вместе с меню
+     * @param button - одномерный массив, размещающий наименование всех команд массива в одной строке
+     * @param bot - экземпляр класса {@code TelegramBot}, для вызова статического метода {@code execute}
+     */
+    public void sendMenu(Long chatId, String txt, String[] button, TelegramBot bot) {
+        // создаем объект отправляемого сообщения, в который помещаем объект клавиатуры с одной кнопкой
+        SendMessage msg = new SendMessage(chatId, txt)
+                .replyMarkup(new ReplyKeyboardMarkup(button));
+        SendResponse response = bot.execute(msg);
+        if (!response.isOk()) {
+            logger.info("{" + this.getClass() + "}:Меню не отправлено");
+        }
     }
 
-
-
-
-    /*// метод создания кнопок меню в оболочке отправляемого сообщения
-    public SendMessage makeMenuMessage(Long chatId, String txt, List<String> buttons) {
-        SendMessage sm = new SendMessage(chatId,txt)
-                .replyMarkup(new ReplyKeyboardMarkup(makeKeyboard(MAIN_MENU_BUTTONS_TEXTS)));
-        return sm;
-    }
-
-    // приватный метод создания листа строк для
-    private List<KeyboardRow> makeKeyboard(List<String> buttonTexts) {
-        KeyboardRow buttons = new KeyboardRow();
-        buttons.addAll(buttonTexts);
-        return List.of(buttons);
-    }*/
-
+    /**
+     * Метод предназначен для отправки меню пользователю. Аргументами выступают необходимые параметры
+     * для формирования объекта отправляемого сообщения {@code SendMessage}.Туда же помещается класс меню
+     * {@code ReplyKeyboardMarkup}.Отправляется сообщение вызовом статического метода
+     * {@code execute}
+     * @param chatId - идентификатор чата
+     * @param txt - сообщение( как сопроводительное письмо), которое отправляется вместе с меню
+     * @param buttons - двумерный массив, размещающий массивы команд в несколько строк, количество которых
+     *                зависит от количества одномерных массивов
+     * @param bot - экземпляр класса {@code TelegramBot}, для вызова статического метода {@code execute}
+     */
     public void sendMenu(Long chatId, String txt, String[][] buttons, TelegramBot bot) {
         SendMessage msg = new SendMessage(chatId, txt)
                 .replyMarkup(new ReplyKeyboardMarkup(buttons, true, false, false));

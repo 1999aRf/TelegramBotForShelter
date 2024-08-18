@@ -7,7 +7,9 @@ import shelter.bot.botshelter.services.ClientService;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+*Обработчик запросов к таблице БД сущности {@code Client}
+*/
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {

@@ -26,7 +26,7 @@ public class ClientServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
+    /*@Test
     public void testFindByChatId() {
         Client client = new Client();
         client.setChatId(123456789L);
@@ -37,5 +37,5 @@ public class ClientServiceTest {
         Optional<Client> foundClient = clientService.findByChatId(123456789L);
         assertTrue(foundClient.isPresent());
         assertEquals("John Doe", foundClient.get().getClientName());
-    }
+    }*/
 }

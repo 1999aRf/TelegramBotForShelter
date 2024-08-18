@@ -1,5 +1,8 @@
 package shelter.bot.botshelter.constants;
-
+/**
+* Класс предназначен для хранения команд и массивов строк для создания меню((@code Menu))
+ * @author KhasanovTR
+* */
 public class Commands {
 
     public static final String START_COMMAND = "/start";

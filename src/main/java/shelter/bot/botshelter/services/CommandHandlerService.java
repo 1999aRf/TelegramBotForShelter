@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
-import shelter.bot.botshelter.constants.Commands;
 import shelter.bot.botshelter.listener.BotListener;
 import shelter.bot.botshelter.model.Client;
 import shelter.bot.botshelter.model.Menu;
@@ -15,10 +14,10 @@ import shelter.bot.botshelter.model.Volunteer;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
-import static shelter.bot.botshelter.constants.Texts.*;
 import static shelter.bot.botshelter.constants.Commands.*;
+import static shelter.bot.botshelter.constants.Texts.ASKING_TO_CHOOSE;
+import static shelter.bot.botshelter.constants.Texts.NOT_FOUND;
 
 @Service
 public class CommandHandlerService {
@@ -52,11 +51,12 @@ public class CommandHandlerService {
                     clientService.saveClient(new Client(chatId));
                     menu.sendMenu(chatId,
                             telegramBotConfiguration.getStartMsg(),
-                            MAIN_MENU_COMMANDS,bot);
+                            MAIN_MENU_COMMANDS, bot);
                 } else {
-                    menu.sendMenu(chatId,ASKING_TO_CHOOSE,SUBMENU_NEW_USER,bot);
-                };
-break;
+                    menu.sendMenu(chatId, ASKING_TO_CHOOSE, SUBMENU_NEW_USER, bot);
+                }
+                ;
+                break;
             case CALL_VOLUNTEER:
                 Optional<List<Volunteer>> optional1 = volunteerService.findAll();
 
@@ -66,16 +66,18 @@ break;
                     if (optionalVolunteer.isPresent()) {
                         sendMessage(chatId, optionalVolunteer.get().toString());
                     } else {
-                        sendMessage(chatId,"Волонтеры" + NOT_FOUND);
+                        sendMessage(chatId, "Волонтеры" + NOT_FOUND);
                     }
 
-                }
-                else {
-                    sendMessage(chatId,"Волонтеры" + NOT_FOUND);
+                } else {
+                    sendMessage(chatId, "Волонтеры" + NOT_FOUND);
                 }
                 break;
-
-
+            default:
+                menu.sendMenu(chatId,
+                        telegramBotConfiguration.getStartMsg(),
+                        new String[]{START_COMMAND},
+                        bot);
         }
     }
 
