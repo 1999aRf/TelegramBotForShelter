@@ -1,7 +1,12 @@
 package shelter.bot.botshelter.controller;
 
+/**
+ * Обработчик запросов к таблице БД сущности {@code Shelter}
+ * */
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ShelterService;
 
@@ -44,5 +49,15 @@ public class ShelterController {
     public ResponseEntity<Void> deleteShelter(@PathVariable Long id) {
         shelterService.deleteShelter(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/uploadMap")
+    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            String url = shelterService.saveRouteMap(id, file);
+            return ResponseEntity.ok("File uploaded successfully: " + url);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
+        }
     }
 }

@@ -5,17 +5,31 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name="shelters")
 public class Shelter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "chat_id",nullable = false, unique = true)
     private Long chatId;
+    @Column(name = "client_name",nullable = true)
     private String clientName;
+    @Column(name = "contact_number",nullable = true, unique = true)
     private String contactNumber;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
     private List<Animal> adoptedAnimals;
+
+    private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
+
+    public String getRouteMapUrl() {
+        return routeMapUrl;
+    }
+
+    public void setRouteMapUrl(String routeMapUrl) {
+        this.routeMapUrl = routeMapUrl;
+    }
 
     public Long getId() {
         return id;
