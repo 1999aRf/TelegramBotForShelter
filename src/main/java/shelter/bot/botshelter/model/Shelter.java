@@ -1,9 +1,13 @@
 package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.Objects;
 
+/**
+ * Сущность, представляющая приют.
+ */
 @Entity
 @Table(name="shelters")
 public class Shelter {
@@ -16,11 +20,13 @@ public class Shelter {
     @Column(name = "client_name",nullable = true)
     private String clientName;
     @Column(name = "contact_number",nullable = true, unique = true)
+    @Pattern(regexp = "^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$", message = "Неверный формат номера телефона")
     private String contactNumber;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
     private List<Animal> adoptedAnimals;
 
+    @Column(name = "route_map_url", nullable = true)
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
 
     public String getRouteMapUrl() {
@@ -76,12 +82,16 @@ public class Shelter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Shelter shelter = (Shelter) o;
-        return Objects.equals(id, shelter.id) && Objects.equals(chatId, shelter.chatId) && Objects.equals(clientName, shelter.clientName) && Objects.equals(contactNumber, shelter.contactNumber) && Objects.equals(adoptedAnimals, shelter.adoptedAnimals);
+        return Objects.equals(id, shelter.id) &&
+                Objects.equals(chatId, shelter.chatId) &&
+                Objects.equals(clientName, shelter.clientName) &&
+                Objects.equals(contactNumber, shelter.contactNumber) &&
+                Objects.equals(routeMapUrl, shelter.routeMapUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, clientName, contactNumber, adoptedAnimals);
+        return Objects.hash(id, chatId, clientName, contactNumber, routeMapUrl);
     }
 
     @Override
@@ -91,7 +101,7 @@ public class Shelter {
                 ", chatId=" + chatId +
                 ", clientName='" + clientName + '\'' +
                 ", contactNumber='" + contactNumber + '\'' +
-                ", adoptedAnimals=" + adoptedAnimals +
+                ", routeMapUrl='" + routeMapUrl + '\'' +
                 '}';
     }
 }

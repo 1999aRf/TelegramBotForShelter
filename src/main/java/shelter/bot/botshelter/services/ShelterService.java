@@ -14,6 +14,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервис для управления приютами.
+ */
 @Service
 public class ShelterService {
     private final ShelterRepository shelterRepository;
@@ -21,17 +24,46 @@ public class ShelterService {
     public ShelterService(ShelterRepository shelterRepository) {
         this.shelterRepository = shelterRepository;
     }
+
+    /**
+     * Получить все приюты.
+     *
+     * @return Список всех приютов.
+     */
+
     public List<Shelter> getAllShelters() {
         return shelterRepository.findAll();
     }
+
+    /**
+     * Получить приют по его ID.
+     *
+     * @param id Идентификатор приюта.
+     * @return Приют, если найден.
+     */
 
     public Optional<Shelter> getShelterById(Long id) {
         return shelterRepository.findById(id);
     }
 
+    /**
+     * Создать новый приют.
+     *
+     * @param shelter Данные нового приюта.
+     * @return Созданный приют.
+     */
+
     public Shelter createShelter(Shelter shelter) {
         return shelterRepository.save(shelter);
     }
+
+    /**
+     * Обновить существующий приют.
+     *
+     * @param id      Идентификатор приюта.
+     * @param shelterDetails Обновленные данные приюта.
+     * @return Обновленный приют, если обновление успешно.
+     */
 
     public Shelter updateShelter(Long id, Shelter shelterDetails) {
         Shelter shelter = shelterRepository.findById(id)
@@ -44,6 +76,12 @@ public class ShelterService {
 
         return shelterRepository.save(shelter);
     }
+
+    /**
+     * Удалить приют по его ID.
+     *
+     * @param id Идентификатор приюта.
+     */
 
     public void deleteShelter(Long id) {
         shelterRepository.deleteById(id);
