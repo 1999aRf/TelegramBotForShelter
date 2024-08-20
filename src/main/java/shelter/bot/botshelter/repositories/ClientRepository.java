@@ -6,5 +6,5 @@ import shelter.bot.botshelter.model.Client;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    Optional<Client> findByChatId(Long chatId);
+    Client findByChatId(Long chatId);
 }

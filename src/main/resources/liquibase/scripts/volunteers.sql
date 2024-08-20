@@ -4,7 +4,7 @@
 
 CREATE TABLE volunteers(
 id SERIAL PRIMARY KEY,
-chat_id INT,
+chat_id BIGINT NOT NULL,
 name TEXT,
-contacts SMALLINT
+contacts TEXT
 )

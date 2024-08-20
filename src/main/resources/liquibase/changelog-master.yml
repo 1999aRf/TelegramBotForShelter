@@ -1,5 +1,5 @@
 databaseChangeLog:
   - include:
-      file: liquibase/scripts/user.sql
-  - include:
       file: liquibase/scripts/volunteers.sql
+  - include:
+      file: liquibase/scripts/clients.sql

@@ -7,7 +7,9 @@ import shelter.bot.botshelter.services.ClientService;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+*Обработчик запросов к таблице БД сущности {@code Client}
+*/
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {
@@ -28,7 +30,7 @@ public class ClientController {
         return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public List<Client> getAllClients() {
         return clientService.findAllClients();
     }
