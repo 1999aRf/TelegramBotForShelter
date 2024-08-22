@@ -3,6 +3,7 @@ package shelter.bot.botshelter.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
