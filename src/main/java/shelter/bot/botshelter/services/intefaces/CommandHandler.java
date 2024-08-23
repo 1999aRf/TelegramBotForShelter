@@ -1,9 +1,10 @@
-package shelter.bot.botshelter.constants;
-/**
-* Класс предназначен для хранения команд и массивов строк для создания меню((@code Menu))
- * @author KhasanovTR
-* */
-public class Commands {
+package shelter.bot.botshelter.services.intefaces;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public interface CommandHandler {
 
     public static final String START_COMMAND = "/start";
     public static final String CALL_VOLUNTEER = "Позвать волонтера";
@@ -29,6 +30,13 @@ public class Commands {
     public static final String ADOPTION_COMMAND2 = "Обустройство дома";
     public static final String ADOPTION_COMMAND3 = "Обустройство дома для взрослого питомца";
     public static final String ADOPTION_COMMAND4 = "Обустройство дома для питомца с ограниченными возможностями";
+
+    public final List<String> mainCommandsList = new ArrayList<>(List.of(
+            MAIN_COMMAND1,
+            MAIN_COMMAND2,
+            MAIN_COMMAND3,
+            CALL_VOLUNTEER
+    ));
 
     public static final String[][] MAIN_MENU_COMMANDS = new String[][]{
             new String [] {MAIN_COMMAND1},
@@ -60,5 +68,25 @@ public class Commands {
             new String [] {ADOPTION_COMMAND3},
             new String [] {ADOPTION_COMMAND4}
     };
+
+    void handleMainCommands(Long chatId,String command);
+
+    void handleNewUserCommands(Long chatId,String command);
+    void handleConsultationCommands(Long chatId,String command);
+    void handleDogHandlerCommands(Long chatId,String command);
+    void handleAdoptionCommands(Long chatId,String command);
+
+    default boolean checkContains(String[][] buttonsArray,String command){
+        for (int i = 0; i < buttonsArray.length; i++) {
+            if (buttonsArray[i][0].equals(command)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
 
 }

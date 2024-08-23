@@ -6,7 +6,6 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
-import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,6 @@ import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
-
-import static shelter.bot.botshelter.constants.Commands.*;
-
-import static shelter.bot.botshelter.model.Menu.*;
 
 import java.io.File;
 import java.util.List;
@@ -71,6 +66,8 @@ public class BotListener implements UpdatesListener {
         Long chatId = update.message().chat().id();
         String text = update.message().text();
         commandHandlerService.handleCommand(chatId,text);
+
+
     }
 
     public void sendShelterInfo(Long chatId, Shelter shelter) {
