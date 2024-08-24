@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ShelterService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 /**
@@ -100,12 +101,8 @@ public class ShelterController {
      */
     @Operation(summary = "Загрузить схему проезда", description = "Загружает изображение схемы проезда для приюта и возвращает URL файла.")
     @PostMapping(value = "/{id}/uploadMap",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        try {
-            String url = shelterService.saveRouteMap(id, file);
-            return ResponseEntity.ok("File uploaded successfully: " + url);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
-        }
+    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        shelterService.saveRouteMap(id,file);
+        return ResponseEntity.ok().build();
     }
 }

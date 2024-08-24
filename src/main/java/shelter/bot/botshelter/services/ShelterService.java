@@ -22,6 +22,12 @@ public class ShelterService {
         this.repository = repository;
     }
 
+    public Shelter getShelterByAnimalSign(byte animalSign) {
+        // возвращает приюты в зависимости от того, для кошек они или для собак
+
+        return null;
+    }
+
     /**
      * Получить все приюты.
      *
@@ -84,25 +90,15 @@ public class ShelterService {
         repository.deleteById(id);
     }
 
-    public String saveRouteMap(Long shelterId, MultipartFile file) throws IOException {
+    public void saveRouteMap(Long shelterId, MultipartFile file) throws IOException {
         Optional<Shelter> shelterOpt = repository.findById(shelterId);
         if (shelterOpt.isPresent()) {
             Shelter shelter = shelterOpt.get();
-            String fileName = file.getOriginalFilename();
-            String uploadDir = "uploads/maps/";
 
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) {
-                uploadDirFile.mkdirs();
-            }
-
-            Path filePath = Paths.get(uploadDir + fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            shelter.setRouteMapUrl(filePath.toString());
+            shelter.setMediaType(file.getContentType());
+            shelter.setData(file.getBytes());
             repository.save(shelter);
 
-            return filePath.toString();
         } else {
             throw new RuntimeException("Shelter not found");
         }

@@ -24,10 +24,8 @@ public class Shelter {
     @Pattern(regexp = "^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$", message = "Неверный формат номера телефона")
     private String contactNumber;
 
-
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
     private List<Animal> adoptedAnimals;
-
 
     @Column(name = "route_map_url", nullable = true)
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
@@ -106,5 +104,15 @@ public class Shelter {
                 ", contactNumber='" + contactNumber + '\'' +
                 ", routeMapUrl='" + routeMapUrl + '\'' +
                 '}';
+    }
+
+    public String getBusinessTime() {
+        return "";
+    }
+
+    public void setMediaType(String contentType) {
+    }
+
+    public void setData(byte[] bytes) {
     }
 }
