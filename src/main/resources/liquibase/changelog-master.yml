@@ -3,3 +3,7 @@ databaseChangeLog:
       file: liquibase/scripts/volunteers.sql
   - include:
       file: liquibase/scripts/clients.sql
+  - include:
+      file: liquibase/scripts/shelters.sql
+  - include:
+      file: liquibase/scripts/animals.sql
