@@ -75,4 +75,6 @@ public class Animal {
                 ", shelter=" + shelter +
                 '}';
     }
+
 }
+

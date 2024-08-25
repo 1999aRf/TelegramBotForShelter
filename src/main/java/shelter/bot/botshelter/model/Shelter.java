@@ -2,8 +2,6 @@ package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
-
-
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +22,10 @@ public class Shelter {
     @Column(name = "contact_number",nullable = true, unique = true)
     @Pattern(regexp = "^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$", message = "Неверный формат номера телефона")
     private String contactNumber;
+    @Column(name = "media_type", nullable = false)
+    private String mediaType;
+    @Column(name = "data", nullable = false)
+    private byte[] data;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
     private List<Animal> adoptedAnimals;
@@ -32,22 +34,16 @@ public class Shelter {
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
 
 
-    @Column(name = "business_time")
-    private String businessTime;
-
-    private String mediaType;
-    private byte[] data;
-
-    public String getBusinessTime() {
-        return businessTime;
-    }
-
-    public void setBusinessTime(String businessTime) {
-        this.businessTime = businessTime;
+    public String getMediaType() {
+        return mediaType;
     }
 
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
     public void setData(byte[] data) {

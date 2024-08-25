@@ -121,4 +121,15 @@ public class ShelterService {
             throw new RuntimeException("Shelter not found");
         }
     }
+
+    public void updateRouteMap(Long id, byte[] routeMap) {
+        Shelter shelter = shelterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Shelter not found"));
+
+        if (routeMap != null && routeMap.length > 0) {
+            shelter.setData(routeMap);
+        }
+
+        shelterRepository.save(shelter);
+    }
 }

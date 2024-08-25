@@ -99,11 +99,26 @@ public class ShelterController {
      * @return Статус ответа с URL загруженного файла.
      */
     @Operation(summary = "Загрузить схему проезда", description = "Загружает изображение схемы проезда для приюта и возвращает URL файла.")
+    @PostMapping("/{id}/uploadMap")
+    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            // Проверяем существование приюта по ID
+            Shelter shelter = shelterService.getShelterById(id)
+                    .orElseThrow(() -> new RuntimeException("Shelter not found"));
 
-    @PostMapping(value = "/{id}/uploadMap",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        shelterService.saveRouteMap(id,file);
-        return ResponseEntity.ok().build();
+            // Сохраняем изображение схемы проезда в базу данных
+            byte[] imageData = file.getBytes();
+
+            // Обновить данные приюта, включая загруженную схему проезда
+            shelterService.updateRouteMap(id, imageData); // Обновляем информацию о приюте, включая загруженную карту
+
+            return ResponseEntity.ok("Route map uploaded successfully for shelter ID: " + id);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file due to I/O error");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
+        }
+
     }
 }
 
