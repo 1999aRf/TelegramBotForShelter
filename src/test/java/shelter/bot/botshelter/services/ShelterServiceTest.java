@@ -52,6 +52,8 @@ class ShelterServiceTest {
     void updateShelter() {
         Shelter shelter = new Shelter();
         shelter.setId(1L);
+        byte[] imageData = "dummyData".getBytes();
+
         when(shelterRepository.findById(1L)).thenReturn(Optional.of(shelter));
         when(shelterRepository.save(shelter)).thenReturn(shelter);
 

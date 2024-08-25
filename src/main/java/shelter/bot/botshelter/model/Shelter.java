@@ -23,12 +23,33 @@ public class Shelter {
     @Column(name = "contact_number",nullable = true, unique = true)
     @Pattern(regexp = "^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$", message = "Неверный формат номера телефона")
     private String contactNumber;
+    @Column(name = "media_type", nullable = false)
+    private String mediaType;
+    @Column(name = "data", nullable = false)
+    private byte[] data;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
     private List<Animal> adoptedAnimals;
 
     @Column(name = "route_map_url", nullable = true)
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
+
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
 
     public String getRouteMapUrl() {
         return routeMapUrl;

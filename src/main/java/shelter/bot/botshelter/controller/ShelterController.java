@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ShelterService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 /**
@@ -101,8 +102,19 @@ public class ShelterController {
     @PostMapping("/{id}/uploadMap")
     public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
-            String url = shelterService.saveRouteMap(id, file);
-            return ResponseEntity.ok("File uploaded successfully: " + url);
+            // Проверяем существование приюта по ID
+            Shelter shelter = shelterService.getShelterById(id)
+                    .orElseThrow(() -> new RuntimeException("Shelter not found"));
+
+            // Сохраняем изображение схемы проезда в базу данных
+            byte[] imageData = file.getBytes();
+
+            // Обновить данные приюта, включая загруженную схему проезда
+            shelterService.updateRouteMap(id, imageData); // Обновляем информацию о приюте, включая загруженную карту
+
+            return ResponseEntity.ok("Route map uploaded successfully for shelter ID: " + id);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file due to I/O error");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
         }
