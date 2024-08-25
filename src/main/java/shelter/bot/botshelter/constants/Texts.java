@@ -10,4 +10,7 @@ public class Texts {
     public static final String NOT_FOUND = "не найдены";
     public static final String SHElTER_DOG_INFO = "Информация о приюте для собак представлена в этом сообщении";
     public static final String SHElTER_CAT_INFO = "Информация о приюте для кошек представлена в этом сообщении";
+    public static final String COMMON_RECOMMENDATIONS = "Общие рекомендации";
+    public static final String SAFETY_RULES = "Общие правила техники безопасности";
+
 }

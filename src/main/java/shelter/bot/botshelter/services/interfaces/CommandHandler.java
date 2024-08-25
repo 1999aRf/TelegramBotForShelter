@@ -6,17 +6,29 @@ import java.util.List;
 
 public interface CommandHandler {
 
+    //--------------------------------------------------------------------------
+    //    Маркеры выбора интересующего набора приютов с кошками или собаками
+    //--------------------------------------------------------------------------
     public static final byte CHOSEN_DOGS = 1; // добавлен выбор питомцев
     public static final byte CHOSEN_CATS = 2;
 
+    //--------------------------------------------------------------------------
+    //    Дополнительные кнопки в меню для возврата к предыдущему меню
+    //--------------------------------------------------------------------------
     public static final String CHOSE_MENU = "Выбрать приют"; // добавлены кнопки навигации по меню
     public static final String MAIN_MENU = "Главное меню";
     public static final String NEW_USER_MENU = "О приюте";
     public static final String CONSULTATION_MENU = "Консультация";
 
+    //--------------------------------------------------------------------------
+    //                          Базовые команды
+    //--------------------------------------------------------------------------
     public static final String START_COMMAND = "/start";
     public static final String CALL_VOLUNTEER = "Позвать волонтера";
 
+    //--------------------------------------------------------------------------
+    //                      Команды соответствующего меню
+    //--------------------------------------------------------------------------
     public static final String CHOOSE_SHELTER_COMMAND1 = "Приют для собак";
     public static final String CHOOSE_SHELTER_COMMAND2 = "Приют для кошек";
 
@@ -44,6 +56,9 @@ public interface CommandHandler {
     public static final String ADOPTION_COMMAND3 = "Обустройство дома для взрослого питомца";
     public static final String ADOPTION_COMMAND4 = "Обустройство дома для питомца с ограниченными возможностями";
 
+    //--------------------------------------------------------------------------
+    //              Наборы кнопок для соответствующего в названии меню
+    //--------------------------------------------------------------------------
     public static final String[][] CHOOSE_SHELTER_COMMANDS = new String [][] {
             new String[]{CHOOSE_SHELTER_COMMAND1},
             new String[]{CHOOSE_SHELTER_COMMAND2}
@@ -68,28 +83,123 @@ public interface CommandHandler {
             new String [] {CONSULTATION_COMMAND1},
             new String [] {CONSULTATION_COMMAND2},
             new String [] {CONSULTATION_COMMAND3},
-            new String [] {CONSULTATION_COMMAND4}
+            new String [] {CONSULTATION_COMMAND4},
+            new String [] {NEW_USER_MENU},
     };
     public static final String[][] SUBMENU_DOG_HANDLER = new String[][]{
             new String [] {DOG_HANDLER_COMMAND1},
             new String [] {DOG_HANDLER_COMMAND2},
             new String [] {DOG_HANDLER_COMMAND3},
+            new String [] {CONSULTATION_MENU},
             new String [] {CALL_VOLUNTEER}
     };
     public static final String[][] SUBMENU_ADOPTION = new String[][]{
             new String [] {ADOPTION_COMMAND1},
             new String [] {ADOPTION_COMMAND2},
             new String [] {ADOPTION_COMMAND3},
-            new String [] {ADOPTION_COMMAND4}
+            new String [] {ADOPTION_COMMAND4},
+            new String [] {MAIN_MENU}
     };
 
+    //--------------------------------------------------------------------------
+    //      Методы для обработки команд соответствующего в названии меню
+    //--------------------------------------------------------------------------
+
+    /**
+     * Обработчик команд главного меню. Переносит в другие меню, где пользователь
+     * получить информацию о: <br>
+     * - информации о приюте(в зависимости от того, это приют для собак или кошек)
+     * {@code MAIN_COMMAND1},<br>
+     * - том, как взять животное из приюта{@code MAIN_COMMAND2},<br>
+     * - как отправить отчет о питомце(для усыновивших животное){@code MAIN_COMMAND3}<br>
+     * - возврат к меню выбора интересующего животного {@code CHOSE_MENU}<br>
+     * - позвать волонтера {@code CALL_VOLUNTEER}.
+     *
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleMainCommands(Long chatId,String command);
+
+    /**
+     * Обработчик выбора пользователя об интересующем его приюте(для собак или кошек)<br>
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleChooseShelter(Long chatId,String command);
+
+    /**
+     * Обработчик команд меню, в котором пользователь может узнать различную информацию о
+     * приюте:<br>
+     * - расписание и адрес приюта {@code NEW_USER_COMMAND1},<br>
+     * - оформление разрешения на проезд на территорию приюта и схема проезда(картинка)
+     * {@code NEW_USER_COMMAND2},<br>
+     * - общие сведения о технике безопасности{@code NEW_USER_COMMAND3},<br>
+     * - принять данные для связи {@code NEW_USER_COMMAND4},<br>
+     * - возврат в главное меню {@code MAIN_MENU}
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleNewUserCommands(Long chatId,String command);
+
+    /**
+     * Обработчик команд меню, в котором пользователь получает информацию для будущего усыновителя
+     * животного :<br>
+     * - транспортировка животного{@code CONSULTATION_COMMAND1},<br>
+     * - правила знакомства и усыновления {@code CONSULTATION_COMMAND2},<br>
+     * - список необходимых документов {@code CONSULTATION_COMMAND3},<br>
+     * - рекомендации(для тех, кто хочет усыновить собаку) {@code CONSULTATION_COMMAND4},<br>
+     * - возврат в меню для нового пользователя {@code NEW_USER_MENU}
+     *
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleConsultationCommands(Long chatId,String command);
+
+    /**
+     * Обработчик команд меню, в котором пользователь получает рекомендации уже как усыновившему :<br>
+     * - советы кинолога{@code DOG_HANDLER_COMMAND1},<br>
+     * - проверенные кинологи {@code DOG_HANDLER_COMMAND2},<br>
+     * - причины отказа {@code DOG_HANDLER_COMMAND3},<br>
+     * - рекомендации(для тех, кто хочет усыновить собаку) {@code CONSULTATION_COMMAND4},<br>
+     * - возврат в меню консультации {@code CONSULTATION_MENU},<br>
+     * - вызов волонтера{@code CALL_VOLUNTEER}
+     *
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleDogHandlerCommands(Long chatId,String command);
+
+    /**
+     * Обработчик команд меню, в котором усыновивший животное пользователь получает рекомендации:<br>
+     * - транспортировка животного{@code ADOPTION_COMMAND1},<br>
+     * - обустройство дома{@code ADOPTION_COMMAND2},<br>
+     * - обустройство дома для взрослого питомца{@code ADOPTION_COMMAND3},<br>
+     * - обустройство дома для питомца с ограниченными возможностями{@code ADOPTION_COMMAND4},<br>
+     * - возврат в главное меню{@code MAIN_MENU}.
+     *
+     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
+     *               сохраняется вместе с его выбором интересующего приюта для выдачи
+     *               актуальной для него информации в следующих меню)
+     * @param command - текущая команда, которую отправил пользователь
+     */
     void handleAdoptionCommands(Long chatId,String command);
 
+    /**
+     * Метод проверяет, есть ли команда в соответствуюем меню.
+     * @param buttonsArray - набор кнопок меню
+     * @param command - команда, к которой ищет соответствие в разных наборах кнопок.
+     * @return - {@code true}- если есть, {@code false} - если нет такой команды
+     */
     default boolean checkContains(String[][] buttonsArray,String command){
         for (int i = 0; i < buttonsArray.length; i++) {
             if (buttonsArray[i][0].equals(command)) {

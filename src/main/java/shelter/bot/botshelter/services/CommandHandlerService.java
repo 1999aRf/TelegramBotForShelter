@@ -134,7 +134,10 @@ public class CommandHandlerService implements CommandHandler {
 
                 break;
             case CHOSE_MENU:
-                menu.sendMenu(chatId, "Какое животное желаете приютить", CHOOSE_SHELTER_COMMANDS, bot);
+                menu.sendMenu(chatId,
+                        "Какое животное желаете приютить?",
+                        CHOOSE_SHELTER_COMMANDS,
+                        bot);
                 break;
         }
     }
@@ -150,11 +153,15 @@ public class CommandHandlerService implements CommandHandler {
             chatIdChosen = chatId;
             chosenShelter = CHOSEN_CATS;
         } else {
-            menu.sendMenu(chatId, "Вы не выбрали приют!!!", CHOOSE_SHELTER_COMMANDS, bot);
+            menu.sendMenu(chatId,
+                    "Вы не выбрали приют!!!",
+                    CHOOSE_SHELTER_COMMANDS,
+                    bot);
         }
         menu.sendMenu(chatId,
                 "Что выберете",
-                MAIN_MENU_COMMANDS, bot);
+                MAIN_MENU_COMMANDS,
+                bot);
     }
 
     //______________________________________________________________________________________
@@ -198,7 +205,7 @@ public class CommandHandlerService implements CommandHandler {
                 break;
 
             case NEW_USER_COMMAND3:
-                menu.sendMenu(chatId, "Общие правила техники безопасности", SUBMENU_NEW_USER, bot);
+                menu.sendMenu(chatId, SAFETY_RULES, SUBMENU_NEW_USER, bot);
                 break;
             case NEW_USER_COMMAND4:
 
