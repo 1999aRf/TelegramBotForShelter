@@ -3,6 +3,7 @@ package shelter.bot.botshelter.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 
+
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ public class Shelter {
     @Column(name = "route_map_url", nullable = true)
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
 
+
     @Column(name = "business_time")
     private String businessTime;
 
@@ -51,7 +53,6 @@ public class Shelter {
     public void setData(byte[] data) {
         this.data = data;
     }
-
 
     public String getRouteMapUrl() {
         return routeMapUrl;
@@ -129,5 +130,5 @@ public class Shelter {
                 '}';
     }
 
-
 }
+

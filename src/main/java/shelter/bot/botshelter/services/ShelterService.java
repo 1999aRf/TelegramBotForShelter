@@ -1,6 +1,7 @@
 package shelter.bot.botshelter.services;
 
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.repositories.ShelterRepository;
@@ -13,6 +14,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+
+
 @Service
 public class ShelterService {
 
@@ -26,6 +29,8 @@ public class ShelterService {
         // возвращает приюты в зависимости от того, для кошек они или для собак
 
         return null;
+
+
     }
 
     /**
@@ -35,7 +40,9 @@ public class ShelterService {
      */
 
     public List<Shelter> getAllShelters() {
+
         return repository.findAll();
+
     }
 
     /**
@@ -46,7 +53,9 @@ public class ShelterService {
      */
 
     public Optional<Shelter> getShelterById(Long id) {
+
         return repository.findById(id);
+
     }
 
     /**
@@ -57,7 +66,9 @@ public class ShelterService {
      */
 
     public Shelter createShelter(Shelter shelter) {
+
         return repository.save(shelter);
+
     }
 
     /**
@@ -69,7 +80,9 @@ public class ShelterService {
      */
 
     public Shelter updateShelter(Long id, Shelter shelterDetails) {
+
         Shelter shelter = repository.findById(id)
+
                 .orElseThrow(() -> new RuntimeException("Shelter not found"));
 
         shelter.setChatId(shelterDetails.getChatId());
@@ -77,7 +90,9 @@ public class ShelterService {
         shelter.setContactNumber(shelterDetails.getContactNumber());
         shelter.setAdoptedAnimals(shelterDetails.getAdoptedAnimals());
 
+
         return repository.save(shelter);
+
     }
 
     /**
@@ -87,6 +102,7 @@ public class ShelterService {
      */
 
     public void deleteShelter(Long id) {
+
         repository.deleteById(id);
     }
 
@@ -98,6 +114,8 @@ public class ShelterService {
             shelter.setMediaType(file.getContentType());
             shelter.setData(file.getBytes());
             repository.save(shelter);
+
+=======
 
         } else {
             throw new RuntimeException("Shelter not found");
