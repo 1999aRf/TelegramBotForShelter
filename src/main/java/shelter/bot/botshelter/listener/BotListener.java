@@ -18,7 +18,6 @@ import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
-import static shelter.bot.botshelter.constants.Commands.*;
 
 import static shelter.bot.botshelter.model.Menu.*;
 

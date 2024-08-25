@@ -15,7 +15,7 @@ public class ClientRepositoryTest {
     @Autowired
     private ClientRepository clientRepository;
 
-    /*@Test
+    @Test
     public void testSaveAndFindByChatId() {
         Client client = new Client();
         client.setChatId(123456789L);
@@ -24,8 +24,8 @@ public class ClientRepositoryTest {
 
         clientRepository.save(client);
 
-        Optional<Client> foundClient = clientRepository.findByChatId(123456789L);
+        Optional<Client> foundClient = Optional.ofNullable(clientRepository.findByChatId(123456789L));
         assertTrue(foundClient.isPresent());
         assertEquals("John Doe", foundClient.get().getClientName());
-    }*/
+    }
 }
