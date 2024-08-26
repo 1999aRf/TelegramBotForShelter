@@ -12,5 +12,6 @@ public class Texts {
     public static final String SHElTER_CAT_INFO = "Информация о приюте для кошек представлена в этом сообщении";
     public static final String COMMON_RECOMMENDATIONS = "Общие рекомендации";
     public static final String SAFETY_RULES = "Общие правила техники безопасности";
+    public static final String NUMBER_SAVED_SUCCESS = "Номер успешно сохранен";
 
 }

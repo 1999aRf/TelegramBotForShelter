@@ -1,5 +1,4 @@
 package shelter.bot.botshelter.controller;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import java.util.Optional;
  * Контроллер для управления приютами.
  * Обрабатывает запросы на создание, обновление, удаление и получение информации о приютах.
  */
-
 @RestController
 @RequestMapping("/api/shelters")
 @Tag(name = "Shelter Controller", description = "API для работы с приютами")
@@ -68,7 +66,7 @@ public class ShelterController {
     /**
      * Обновить существующий приют.
      *
-     * @param id      Идентификатор приюта.
+     * @param id             Идентификатор приюта.
      * @param shelterDetails Обновленные данные приюта.
      * @return Обновленный приют.
      */
@@ -101,8 +99,23 @@ public class ShelterController {
      */
     @Operation(summary = "Загрузить схему проезда", description = "Загружает изображение схемы проезда для приюта и возвращает URL файла.")
     @PostMapping(value = "/{id}/uploadMap",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        shelterService.saveRouteMap(id,file);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            // Проверяем существование приюта по ID
+            Shelter shelter = shelterService.getShelterById(id)
+                    .orElseThrow(() -> new RuntimeException("Shelter not found"));
+
+            // Сохраняем изображение схемы проезда в базу данных
+            byte[] imageData = file.getBytes();
+
+            // Обновить данные приюта, включая загруженную схему проезда
+            shelterService.updateRouteMap(id, imageData); // Обновляем информацию о приюте, включая загруженную карту
+
+            return ResponseEntity.ok("Route map uploaded successfully for shelter ID: " + id);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file due to I/O error");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
+        }
     }
 }

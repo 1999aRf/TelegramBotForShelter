@@ -1,5 +1,6 @@
 package shelter.bot.botshelter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -17,8 +18,9 @@ public class Animal {
     @Column(name = "species", nullable = false)
     private String species;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "shelter_id", nullable = false)
+    @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 
     public Long getId() {

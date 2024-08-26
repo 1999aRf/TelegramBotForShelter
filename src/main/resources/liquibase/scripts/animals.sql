@@ -6,5 +6,5 @@ CREATE TABLE animals(
 id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   species TEXT NOT NULL,
-  shelter_id BIGINT NOT NULL
+  shelter_id BIGINT references shelters(id)
 );

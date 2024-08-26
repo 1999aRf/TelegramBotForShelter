@@ -1,6 +1,7 @@
 package shelter.bot.botshelter.services;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -43,10 +44,18 @@ public class CommandHandlerService implements CommandHandler {
         this.telegramBotConfiguration = telegramBotConfiguration;
     }
 
-    private byte chosenShelter = 0; // хранит выбранный приют:с собаками или кошками(1\2)
-    private long chatIdChosen; // хранит id чата, кто и выбрал приют с кошками или собаками
+    /*private byte chosenShelter = 0; // хранит выбранный приют:с собаками или кошками(1\2)
+    private long chatIdChosen; // хранит id чата, кто и выбрал приют с кошками или собаками*/
+    private String prevCommand; // хранит название предыдущей команды
 
-    public void handleCommand(Long chatId, String command) {
+    public void handleCommand(Message message) {
+
+        Long chatId = message.chat().id();
+        String command = message.text();
+
+        logger.info("HandlerCommand метод запущен");
+
+
         if (checkContains(MAIN_MENU_COMMANDS, command)) {
             handleMainCommands(chatId, command);
         } else if (checkContains(SUBMENU_NEW_USER, command)) {
@@ -58,44 +67,47 @@ public class CommandHandlerService implements CommandHandler {
         } else if (checkContains(SUBMENU_ADOPTION, command)) {
             handleAdoptionCommands(chatId, command);
         } else {
+            logger.info("обработка базовых команд");
+
             switch (command) {
+
                 case START_COMMAND:
                     Optional<Client> optional = clientService.findByChatId(chatId);
                     if (optional.isEmpty()) {
-                        clientService.saveClient(new Client(chatId));
+                        clientService.saveClient(new Client(
+                                chatId, //идентификатор чата
+                                message.from().firstName() + message.from().lastName()) // полное имя клиента
+                        );
                         menu.sendMenu(chatId,
                                 telegramBotConfiguration.getStartMsg(),
-                                CHOOSE_SHELTER_COMMANDS, bot);
+                                MAIN_MENU_COMMANDS, bot);
                     } else {
                         menu.sendMenu(chatId, ASKING_TO_CHOOSE, SUBMENU_NEW_USER, bot);
                     }
                     ;
                     break;
                 case CALL_VOLUNTEER:
+                    logger.info(CALL_VOLUNTEER + " команда запущена");
+
                     Optional<List<Volunteer>> optional1 = volunteerService.findAll();
 
                     if (optional1.isPresent()) {
-
-                        Optional<Volunteer> optionalVolunteer = getVolunteer();
-                        if (optionalVolunteer.isPresent()) {
-                            sendMessage(chatId, optionalVolunteer.get().toString());
-                        } else {
-                            sendMessage(chatId, "Волонтеры" + NOT_FOUND);
-                        }
+                        logger.info(CALL_VOLUNTEER + " в списке найдены волонтеры");
+                        Volunteer volunteer = optional1.get().get(0);
+                        sendMessage(chatId, volunteer.toString());
 
                     } else {
                         sendMessage(chatId, "Волонтеры" + NOT_FOUND);
+                        logger.info("волонтеров на самом деле нет");
                     }
                     break;
 
                 default:
-                    menu.sendMenu(chatId,
-                            telegramBotConfiguration.getStartMsg(),
-                            new String[]{START_COMMAND},
-                            bot);
+                    handleUserText(chatId, command);
             }
         }
 
+        prevCommand = command;
     }
 
     private Optional<Volunteer> getVolunteer() {
@@ -115,12 +127,9 @@ public class CommandHandlerService implements CommandHandler {
 
         switch (command) {
             case MAIN_COMMAND1:
-                if (chatIdChosen == chatId & chosenShelter == CHOSEN_DOGS) {
-                    menu.sendMenu(chatId, SHElTER_DOG_INFO, MAIN_MENU_COMMANDS, bot);
 
-                } else if (chatIdChosen == chatId & chosenShelter == CHOSEN_CATS) {
-                    menu.sendMenu(chatId, SHElTER_CAT_INFO, MAIN_MENU_COMMANDS, bot);
-                }
+                menu.sendMenu(chatId, SHElTER_DOG_INFO, SUBMENU_NEW_USER, bot);
+
                 break;
             case MAIN_COMMAND2:
 
@@ -144,7 +153,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleChooseShelter(Long chatId, String command) {
-        if (command.equals(CHOOSE_SHELTER_COMMAND1)) {
+        /*if (command.equals(CHOOSE_SHELTER_COMMAND1)) {
             chatIdChosen = chatId;
             chosenShelter = CHOSEN_DOGS;
 
@@ -161,7 +170,7 @@ public class CommandHandlerService implements CommandHandler {
         menu.sendMenu(chatId,
                 "Что выберете",
                 MAIN_MENU_COMMANDS,
-                bot);
+                bot);*/
     }
 
     //______________________________________________________________________________________
@@ -174,41 +183,30 @@ public class CommandHandlerService implements CommandHandler {
 
         switch (command) {
             case NEW_USER_COMMAND1:
-                if (chatIdChosen == chatId & chosenShelter == CHOSEN_DOGS) {
-                    Shelter shelter = shelterService.getShelterByAnimalSign(CHOSEN_DOGS);
-                    sendMessage(chatId, SHElTER_DOG_INFO);
-                    menu.sendMenu(chatId,
-                            "Расписание: " + shelter.getBusinessTime(),
-                            SUBMENU_NEW_USER,
-                            bot);
 
-                } else if (chatIdChosen == chatId & chosenShelter == CHOSEN_CATS) {
-                    Shelter shelter = shelterService.getShelterByAnimalSign(CHOSEN_CATS);
-                    sendMessage(chatId, SHElTER_CAT_INFO);
-                    menu.sendMenu(chatId,
-                            "Расписание: " + shelter.getBusinessTime(),
-                            SUBMENU_NEW_USER,
-                            bot);
-                }
+                Shelter shelter = shelterService.getShelterById(1L).get();
+                sendMessage(chatId, SHElTER_DOG_INFO);
+                menu.sendMenu(chatId,
+                        "Расписание: " + shelter.getBusinessTime(),
+                        SUBMENU_NEW_USER,
+                        bot);
+
+
                 break;
             case NEW_USER_COMMAND2:
-                if (chatIdChosen == chatId & chosenShelter == CHOSEN_DOGS) {
-                    Shelter shelter = shelterService.getShelterByAnimalSign(CHOSEN_DOGS);
-                    sendShelterInfo(chatId, shelter);
-                    menu.sendMenu(chatId, "Можем вам предложить", SUBMENU_NEW_USER, bot);
 
-                } else if (chatIdChosen == chatId & chosenShelter == CHOSEN_CATS) {
-                    Shelter shelter = shelterService.getShelterByAnimalSign(CHOSEN_CATS);
-                    sendShelterInfo(chatId, shelter);
-                    menu.sendMenu(chatId, "Можем вам предложить", SUBMENU_NEW_USER, bot);
-                }
+
+                sendShelterInfo(chatId, shelterService.getShelterById(1L).get());
+                menu.sendMenu(chatId, "Можем вам предложить", SUBMENU_NEW_USER, bot);
+
+
                 break;
 
             case NEW_USER_COMMAND3:
                 menu.sendMenu(chatId, SAFETY_RULES, SUBMENU_NEW_USER, bot);
                 break;
             case NEW_USER_COMMAND4:
-
+                sendMessage(chatId, "Введите номер согласно маске +7-9**-***-**-");
                 break;
             case MAIN_MENU:
                 menu.sendMenu(chatId,
@@ -275,6 +273,38 @@ public class CommandHandlerService implements CommandHandler {
         }
     }
 
+    @Override
+    public void handleUserText(Long chatId, String command) {
+        logger.info("обработка номера");
+
+        // обработка номера. Если текущий текст предыдущая команда была "принять данные для связи",
+        // то следует проверка на соответствие маске и сохранение номера для соответствующего клиента
+        // иначе код будет расценивать команду недействительной и отправит пользователя на старт
+        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(NEW_USER_COMMAND4)) {
+            if (validateNumber(command)) {
+                Client client = clientService.findByChatId(chatId).get();
+                client.setContactNumber(command);
+                clientService.saveClient(client);
+                menu.sendMenu(chatId,
+                        NUMBER_SAVED_SUCCESS,
+                        SUBMENU_NEW_USER,
+                        bot);
+                return;
+
+            } else {
+                sendMessage(chatId, "Введите корректный номер согласно маске +7-9**-***-**-");
+
+            }
+        } else {
+            menu.sendMenu(chatId,
+                    telegramBotConfiguration.getStartMsg(),
+                    new String[]{START_COMMAND},
+                    bot);
+        }
+
+    }
+
+
     public void sendShelterInfo(Long chatId, Shelter shelter) {
         SendMessage message = new SendMessage(chatId,
                 "Контактный номер: " + shelter.getContactNumber());
@@ -283,8 +313,8 @@ public class CommandHandlerService implements CommandHandler {
         bot.execute(message);
 
         // Если есть схема проезда, отправляем её как фото
-        if (shelter.getRouteMapUrl() != null) {
-            SendPhoto sendPhoto = new SendPhoto(chatId, new File(shelter.getRouteMapUrl()));
+        if (shelter.getData() != null) {
+            SendPhoto sendPhoto = new SendPhoto(chatId, shelter.getData());
             sendPhoto.caption("Схема проезда к приюту");
             bot.execute(sendPhoto);
         }

@@ -3,7 +3,9 @@ package shelter.bot.botshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
@@ -64,11 +66,11 @@ public class BotListener implements UpdatesListener {
     private void processUpdate(Update update) {
         logger.info("Processing update: {}", update);
 
-        Long chatId = update.message().chat().id();
-        String text = update.message().text();
+
+        Message message = update.message();
 
 
-        commandHandlerService.handleCommand(chatId,text);
+        commandHandlerService.handleCommand(message);
 
 
 

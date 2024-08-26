@@ -3,9 +3,14 @@ package shelter.bot.botshelter.services.interfaces;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public interface CommandHandler {
 
+    // паттерн для валидации номера формата +7-9**-***-**-
+
+    Pattern validNumber = Pattern.compile("^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$");
     //--------------------------------------------------------------------------
     //    Маркеры выбора интересующего набора приютов с кошками или собаками
     //--------------------------------------------------------------------------
@@ -201,12 +206,34 @@ public interface CommandHandler {
      * @return - {@code true}- если есть, {@code false} - если нет такой команды
      */
     default boolean checkContains(String[][] buttonsArray,String command){
+        if (command.equals(CALL_VOLUNTEER)) {
+            return false;
+        }
         for (int i = 0; i < buttonsArray.length; i++) {
             if (buttonsArray[i][0].equals(command)) {
                 return true;
             }
         }
         return false;
+    }
+
+    //--------------------------------------------------------------------------
+    //              Методы для обработки текста пользователя
+    //--------------------------------------------------------------------------
+
+    /**
+     * Метод для обработки команды {@code NEW_USER_COMMAND4} - принять данные для связи.
+     * @param chatId - идентификатор текущего чата
+     * @param command - введенный пользователем текст
+     */
+    void handleUserText(Long chatId,String command);
+    /**
+     * Метод валидации номера согласно маске {@code validNumber}
+     * @param command - введенный текст пользователя
+     * @return - {@code true}, если текст пользователя соответствует маске
+     */
+    default boolean validateNumber(String command) {
+        return validNumber.matcher(command).matches();
     }
 
 
