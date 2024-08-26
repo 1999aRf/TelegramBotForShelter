@@ -5,10 +5,6 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.User;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SendPhoto;
-import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
 import shelter.bot.botshelter.model.Menu;
-import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
-
-import static shelter.bot.botshelter.model.Menu.*;
-
-import java.io.File;
 import java.util.List;
 
 @Component
@@ -75,19 +66,8 @@ public class BotListener implements UpdatesListener {
 
         commandHandlerService.handleCommand(message);
 
-    public void sendShelterInfo(Long chatId, Shelter shelter) {
-        SendMessage message = new SendMessage(chatId, "Информация о приюте:\n" +
-                "Название: " + shelter.getClientName() + "\n" +
-                "Контактный номер: " + shelter.getContactNumber());
 
-        // Отправляем текстовое сообщение с информацией
-        telegramBot.execute(message);
 
-        // Если есть схема проезда, отправляем её как фото
-        if (shelter.getRouteMapUrl() != null) {
-            SendPhoto sendPhoto = new SendPhoto(chatId, new File(shelter.getRouteMapUrl()));
-            sendPhoto.caption("Схема проезда к приюту");
-            telegramBot.execute(sendPhoto);
-        }
     }
+
 }

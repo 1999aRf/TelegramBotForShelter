@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset 1999aRf:3
+-- changeset pupuskjaer:3
 
 CREATE TABLE shelters(
 id SERIAL PRIMARY KEY,
