@@ -11,7 +11,7 @@ import java.util.Optional;
 *Обработчик запросов к таблице БД сущности {@code Client}
 */
 @RestController
-@RequestMapping("/api/clients")
+@RequestMapping("api/clients")
 public class ClientController {
     private final ClientService clientService;
 

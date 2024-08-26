@@ -3,7 +3,9 @@ package shelter.bot.botshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -18,7 +20,6 @@ import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
-import static shelter.bot.botshelter.constants.Commands.*;
 
 import static shelter.bot.botshelter.model.Menu.*;
 
@@ -68,10 +69,11 @@ public class BotListener implements UpdatesListener {
     private void processUpdate(Update update) {
         logger.info("Processing update: {}", update);
 
-        Long chatId = update.message().chat().id();
-        String text = update.message().text();
-        commandHandlerService.handleCommand(chatId,text);
-    }
+
+        Message message = update.message();
+
+
+        commandHandlerService.handleCommand(message);
 
     public void sendShelterInfo(Long chatId, Shelter shelter) {
         SendMessage message = new SendMessage(chatId, "Информация о приюте:\n" +

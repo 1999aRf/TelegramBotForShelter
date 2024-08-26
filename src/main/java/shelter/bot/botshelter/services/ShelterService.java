@@ -1,10 +1,8 @@
 package shelter.bot.botshelter.services;
-
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.repositories.ShelterRepository;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +11,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
-
 /**
  * Сервис для управления приютами.
  */
@@ -120,5 +117,9 @@ public class ShelterService {
         }
 
         shelterRepository.save(shelter);
+    }
+
+    public Shelter getShelterByAnimalSign(byte chosenDogs) {
+        return null;
     }
 }

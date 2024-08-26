@@ -20,10 +20,9 @@ public class Client {
     @Column(name = "contact_number",nullable = true, unique = true)
     private String contactNumber;
 
-    public Client(Long chatId, String clientName, String contactNumber) {
+    public Client(Long chatId, String clientName) {
         this.chatId = chatId;
         this.clientName = clientName;
-        this.contactNumber = contactNumber;
     }
 
     public Client(Long chatId) {

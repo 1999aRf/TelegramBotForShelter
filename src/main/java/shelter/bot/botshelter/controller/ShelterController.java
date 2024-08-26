@@ -1,8 +1,8 @@
 package shelter.bot.botshelter.controller;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -67,7 +67,7 @@ public class ShelterController {
     /**
      * Обновить существующий приют.
      *
-     * @param id      Идентификатор приюта.
+     * @param id             Идентификатор приюта.
      * @param shelterDetails Обновленные данные приюта.
      * @return Обновленный приют.
      */
@@ -99,7 +99,7 @@ public class ShelterController {
      * @return Статус ответа с URL загруженного файла.
      */
     @Operation(summary = "Загрузить схему проезда", description = "Загружает изображение схемы проезда для приюта и возвращает URL файла.")
-    @PostMapping("/{id}/uploadMap")
+    @PostMapping(value = "/{id}/uploadMap",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             // Проверяем существование приюта по ID
