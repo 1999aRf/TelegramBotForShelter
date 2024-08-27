@@ -2,6 +2,7 @@ package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +20,9 @@ public class Client {
 
     @Column(name = "contact_number",nullable = true, unique = true)
     private String contactNumber;
+
+    @OneToMany(mappedBy = "client")
+    private Collection<Adoptions> adoptions;
 
     public Client(Long chatId, String clientName) {
         this.chatId = chatId;

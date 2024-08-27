@@ -10,13 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
 import shelter.bot.botshelter.listener.BotListener;
-import shelter.bot.botshelter.model.Client;
-import shelter.bot.botshelter.model.Menu;
-import shelter.bot.botshelter.model.Shelter;
-import shelter.bot.botshelter.model.Volunteer;
+import shelter.bot.botshelter.model.*;
 import shelter.bot.botshelter.services.interfaces.CommandHandler;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,15 +28,17 @@ public class CommandHandlerService implements CommandHandler {
     private final ClientService clientService;
     private final VolunteerService volunteerService;
     private final ShelterService shelterService;
+    private final AdoptionService adoptionService;
 
     private final TelegramBotConfiguration telegramBotConfiguration;
 
-    public CommandHandlerService(TelegramBot bot, Menu menu, ClientService clientService, VolunteerService volunteerService, ShelterService shelterService, TelegramBotConfiguration telegramBotConfiguration) {
+    public CommandHandlerService(TelegramBot bot, Menu menu, ClientService clientService, VolunteerService volunteerService, ShelterService shelterService, AdoptionService adoptionService, TelegramBotConfiguration telegramBotConfiguration) {
         this.bot = bot;
         this.menu = menu;
         this.clientService = clientService;
         this.volunteerService = volunteerService;
         this.shelterService = shelterService;
+        this.adoptionService = adoptionService;
         this.telegramBotConfiguration = telegramBotConfiguration;
     }
 
@@ -62,10 +60,10 @@ public class CommandHandlerService implements CommandHandler {
             handleNewUserCommands(chatId, command);
         } else if (checkContains(SUBMENU_CONSULTATION, command)) {
             handleConsultationCommands(chatId, command);
-        } else if (checkContains(SUBMENU_DOG_HANDLER, command)) {
-            handleDogHandlerCommands(chatId, command);
-        } else if (checkContains(SUBMENU_ADOPTION, command)) {
+        }else if (checkContains(SUBMENU_ADOPTION, command)) {
             handleAdoptionCommands(chatId, command);
+        } else if (checkContains(SUBMENU_DOG_HANDLER, command)) {
+                handleDogHandlerCommands(chatId, command);
         } else {
             logger.info("обработка базовых команд");
 
@@ -132,7 +130,7 @@ public class CommandHandlerService implements CommandHandler {
 
                 break;
             case MAIN_COMMAND2:
-
+                menu.sendMenu(chatId, CONSULTATION_MENU, SUBMENU_CONSULTATION, bot);
                 break;
 
             case MAIN_COMMAND3:
@@ -173,11 +171,7 @@ public class CommandHandlerService implements CommandHandler {
                 bot);*/
     }
 
-    //______________________________________________________________________________________
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // нет реализации принятия данных о пользователе для связи
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //______________________________________________________________________________________
+
     @Override
     public void handleNewUserCommands(Long chatId, String command) {
 
@@ -221,16 +215,38 @@ public class CommandHandlerService implements CommandHandler {
         switch (command) {
             case CONSULTATION_COMMAND1:
 
+                Optional<Shelter> shelterById = shelterService.getShelterById(1L);
+                if (shelterById.isPresent()) { // существует ли какой-нибудь приют в бд
+                    Optional<List<Animal>> availableAnimals = Optional.ofNullable(
+                            shelterById.get().getAvailableAnimals()
+                    );
+                    if (availableAnimals.isPresent()) { // есть ли в приюте какие-либо животные
+                        menu.sendMenu(chatId,
+                                availableAnimals.get().toString(),
+                                SUBMENU_CONSULTATION,
+                                bot);
+                    } else {
+                        sendMessage(chatId, ANIMALS_ARE_NOT_AVAILABLE);
+                    }
+
+                } else {
+                    sendMessage(chatId, SHELTER_IS_NOT_AVAILABLE);
+
+                }
                 break;
             case CONSULTATION_COMMAND2:
+                sendMessage(chatId, RULES_OF_ACQUAINTANCE_AND_ADOPTION);
 
                 break;
 
             case CONSULTATION_COMMAND3:
-
+                sendMessage(chatId, NEEDED_DOCS);
                 break;
             case CONSULTATION_COMMAND4:
-
+                menu.sendMenu(chatId,
+                        "Доступный список рекомендаций",
+                        SUBMENU_ADOPTION,
+                        bot);
                 break;
         }
     }
@@ -239,14 +255,20 @@ public class CommandHandlerService implements CommandHandler {
     public void handleDogHandlerCommands(Long chatId, String command) {
         switch (command) {
             case DOG_HANDLER_COMMAND1:
-
+                sendMessage(chatId, DOG_HANDLERS_RECOMMENDATIONS);
                 break;
             case DOG_HANDLER_COMMAND2:
-
+                sendMessage(chatId, DOG_HANDLER_LIST);
                 break;
 
             case DOG_HANDLER_COMMAND3:
-
+                sendMessage(chatId, REASONS_FOR_REFUSAL);
+                break;
+            case CONSULTATION_MENU:
+                menu.sendMenu(chatId,
+                        CONSULTATION_MENU,
+                        SUBMENU_CONSULTATION,
+                        bot);
                 break;
 
         }
@@ -256,18 +278,32 @@ public class CommandHandlerService implements CommandHandler {
     public void handleAdoptionCommands(Long chatId, String command) {
         switch (command) {
             case ADOPTION_COMMAND1:
+                sendMessage(chatId, RULES_ANIMAL_TRANSPORTATION);
 
                 break;
             case ADOPTION_COMMAND2:
+                sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_PUPPY);
 
                 break;
 
             case ADOPTION_COMMAND3:
-
+                sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_GROWNUPS);
                 break;
 
             case ADOPTION_COMMAND4:
-
+                sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_DISABLED);
+                break;
+            case DOG_HANDLER_MENU:
+                menu.sendMenu(chatId,
+                        DOG_HANDLER_MENU,
+                        SUBMENU_DOG_HANDLER,
+                        bot);
+                break;
+            case MAIN_MENU:
+                menu.sendMenu(chatId,
+                        MAIN_MENU,
+                        MAIN_MENU_COMMANDS,
+                        bot);
                 break;
 
         }

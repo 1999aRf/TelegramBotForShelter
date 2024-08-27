@@ -7,3 +7,5 @@ databaseChangeLog:
       file: liquibase/scripts/shelters.sql
   - include:
       file: liquibase/scripts/animals.sql
+  - include:
+      file: liquibase/scripts/adoptions.sql

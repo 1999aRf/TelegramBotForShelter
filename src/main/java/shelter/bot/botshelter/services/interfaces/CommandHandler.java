@@ -24,6 +24,8 @@ public interface CommandHandler {
     public static final String MAIN_MENU = "Главное меню";
     public static final String NEW_USER_MENU = "О приюте";
     public static final String CONSULTATION_MENU = "Консультация";
+    public static final String RECOMMENDATION_MENU = "Рекомендации";
+    public static final String DOG_HANDLER_MENU = "Советы кинолога";
 
     //--------------------------------------------------------------------------
     //                          Базовые команды
@@ -57,7 +59,7 @@ public interface CommandHandler {
     public static final String DOG_HANDLER_COMMAND3 = "Причины отказа";
 
     public static final String ADOPTION_COMMAND1 = "Транспортировка животного";
-    public static final String ADOPTION_COMMAND2 = "Обустройство дома";
+    public static final String ADOPTION_COMMAND2 = "Обустройство дома для щенка";
     public static final String ADOPTION_COMMAND3 = "Обустройство дома для взрослого питомца";
     public static final String ADOPTION_COMMAND4 = "Обустройство дома для питомца с ограниченными возможностями";
 
@@ -73,7 +75,7 @@ public interface CommandHandler {
             new String [] {MAIN_COMMAND1},
             new String [] {MAIN_COMMAND2},
             new String [] {MAIN_COMMAND3},
-            new String [] {CHOSE_MENU},
+//            new String [] {CHOSE_MENU},
             new String [] {CALL_VOLUNTEER}
     };
     public static final String[][] SUBMENU_NEW_USER = new String[][]{
@@ -98,11 +100,13 @@ public interface CommandHandler {
             new String [] {CONSULTATION_MENU},
             new String [] {CALL_VOLUNTEER}
     };
+
     public static final String[][] SUBMENU_ADOPTION = new String[][]{
             new String [] {ADOPTION_COMMAND1},
             new String [] {ADOPTION_COMMAND2},
             new String [] {ADOPTION_COMMAND3},
             new String [] {ADOPTION_COMMAND4},
+            new String [] {DOG_HANDLER_MENU},
             new String [] {MAIN_MENU}
     };
 
