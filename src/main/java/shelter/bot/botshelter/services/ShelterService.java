@@ -59,7 +59,7 @@ public class ShelterService {
         shelter.setChatId(shelterDetails.getChatId());
         shelter.setClientName(shelterDetails.getClientName());
         shelter.setContactNumber(shelterDetails.getContactNumber());
-        shelter.setAdoptedAnimals(shelterDetails.getAdoptedAnimals());
+        shelter.setAvailableAnimals(shelterDetails.getAvailableAnimals());
         return shelterRepository.save(shelter);
     }
     /**

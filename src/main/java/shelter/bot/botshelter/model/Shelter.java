@@ -29,13 +29,15 @@ public class Shelter {
     @Column(name = "data", nullable = true)
     private byte[] data;
 
-    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
-    private List<Animal> adoptedAnimals;
+    @OneToMany(mappedBy = "shelter",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER)
+    private List<Animal> availableAnimals;
 
     @Column(name = "route_map_url", nullable = true)
     private String routeMapUrl; // Поле для хранения URL или пути к схеме проезда
 
-    public Shelter(Long id, Long chatId, String clientName, String contactNumber, String businessTime, String mediaType, byte[] data, List<Animal> adoptedAnimals, String routeMapUrl) {
+    public Shelter(Long id, Long chatId, String clientName, String contactNumber, String businessTime, String mediaType, byte[] data, List<Animal> availableAnimals, String routeMapUrl) {
         this.id = id;
         this.chatId = chatId;
         this.clientName = clientName;
@@ -43,7 +45,7 @@ public class Shelter {
         this.businessTime = businessTime;
         this.mediaType = mediaType;
         this.data = data;
-        this.adoptedAnimals = adoptedAnimals;
+        this.availableAnimals = availableAnimals;
         this.routeMapUrl = routeMapUrl;
     }
 
@@ -104,11 +106,11 @@ public class Shelter {
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
-    public List<Animal> getAdoptedAnimals() {
-        return adoptedAnimals;
+    public List<Animal> getAvailableAnimals() {
+        return availableAnimals;
     }
-    public void setAdoptedAnimals(List<Animal> adoptedAnimals) {
-        this.adoptedAnimals = adoptedAnimals;
+    public void setAvailableAnimals(List<Animal> availableAnimals) {
+        this.availableAnimals = availableAnimals;
     }
     @Override
     public boolean equals(Object o) {
