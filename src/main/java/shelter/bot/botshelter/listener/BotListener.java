@@ -5,6 +5,8 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ public class BotListener implements UpdatesListener {
     private final Menu menu;
 
     private ClientService clientService;
+
 
     @Autowired
     private TelegramBotConfiguration configuration;
@@ -65,9 +68,14 @@ public class BotListener implements UpdatesListener {
 
 
         commandHandlerService.handleCommand(message);
+    }
 
-
-
+    private void sendMessage(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        SendResponse response = telegramBot.execute(sendMessage);
+        if (!response.isOk()) {
+            logger.error("Error during sending message: {}", response.description());
+        }
     }
 
 }
