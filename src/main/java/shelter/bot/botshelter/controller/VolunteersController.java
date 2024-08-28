@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("api/volunteers")
-@Tag(name = "Volunteer")
+@Tag(name = "Volunteer", description = "API для работы с волонтерами")
 public class VolunteersController {
 
     private final VolunteerService service;
