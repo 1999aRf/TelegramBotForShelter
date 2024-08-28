@@ -1,6 +1,7 @@
 package shelter.bot.botshelter.services;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.model.Report;
 import shelter.bot.botshelter.model.User;
@@ -56,7 +57,7 @@ public class ReportServiceImpl implements ReportService {
         String warningMessage = "Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. " +
                 "Пожалуйста, подойди ответственнее к этому занятию. В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного.";
 
-        telegramBot.sendMessage(user.getChatId().toString(), warningMessage);
+        telegramBot.execute(new SendMessage(user.getChatId().toString(), warningMessage));
     }
 
     @Override

@@ -1,10 +1,12 @@
 package shelter.bot.botshelter.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Report;
+import shelter.bot.botshelter.model.User;
 import shelter.bot.botshelter.services.ReportServiceImpl;
 
 import java.io.IOException;
@@ -22,16 +24,16 @@ public class ReportController {
         return ResponseEntity.ok(unreviewedReports);
     }
 
-    @PostMapping("/{reportId}/submit")
-    public ResponseEntity<Void> submitReport(@PathVariable Long reportId,
-                                             @RequestParam("photo") MultipartFile photo,
-                                             @RequestParam("diet") String diet,
-                                             @RequestParam("wellbeing") String wellbeing,
-                                             @RequestParam("behaviorChanges") String behaviorChanges) {
+    @PostMapping(value = "/{reportId}/submit",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> submitReport(@PathVariable Long reportId,
+                                               @RequestParam("photo") MultipartFile photo,
+                                               @RequestParam("diet") String diet,
+                                               @RequestParam("wellbeing") String wellbeing,
+                                               @RequestParam("behaviorChanges") String behaviorChanges) {
         try {
             byte[] photoBytes = photo.getBytes();
             Report report = new Report();
-            report.setUser(reportId); // Ensure User object is set correctly
+            report.setUser(new User()); // reportId Ensure User object is set correctly
             report.setDate(LocalDate.now());
             report.setPhoto(photoBytes);
             report.setDiet(diet);
@@ -39,7 +41,7 @@ public class ReportController {
             report.setBehaviorChanges(behaviorChanges);
             report.setReviewed(false);
             reportService.saveReport(report);
-            return ResponseEntity.ok("Daily report submitted successfully.");
+            return ResponseEntity.ok().body("Daily report submitted successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to submit report due to I/O error.");
         }
