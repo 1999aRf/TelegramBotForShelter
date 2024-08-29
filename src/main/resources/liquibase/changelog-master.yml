@@ -9,3 +9,7 @@ databaseChangeLog:
       file: liquibase/scripts/animals.sql
   - include:
       file: liquibase/scripts/adoptions.sql
+  - include:
+      file: liquibase/scripts/reports.sql
+
+

@@ -24,6 +24,7 @@ public class Client {
     @OneToMany(mappedBy = "client")
     private Collection<Adoptions> adoptions;
 
+
     public Client(Long chatId, String clientName) {
         this.chatId = chatId;
         this.clientName = clientName;
@@ -35,9 +36,6 @@ public class Client {
 
     public Client() {
     }
-    // на будущее, сразу создал для питомцев.
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Pet> adoptedPets;
 
     public Long getId() {
         return id;

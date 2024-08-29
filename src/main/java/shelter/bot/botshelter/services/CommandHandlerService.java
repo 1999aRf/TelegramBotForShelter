@@ -1,14 +1,12 @@
 package shelter.bot.botshelter.services;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
-import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,10 +19,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static shelter.bot.botshelter.constants.Texts.*;
-
+@Singleton
 @Service
 public class CommandHandlerService implements CommandHandler {
 
@@ -51,9 +50,10 @@ public class CommandHandlerService implements CommandHandler {
         this.telegramBotConfiguration = telegramBotConfiguration;
     }
 
-    /*private byte chosenShelter = 0; // хранит выбранный приют:с собаками или кошками(1\2)
-    private long chatIdChosen; // хранит id чата, кто и выбрал приют с кошками или собаками*/
     private String prevCommand; // хранит название предыдущей команды
+    private Report report;
+    private Adoptions adoption;
+
 
     public void handleCommand(Message message) throws IOException {
 
@@ -63,24 +63,16 @@ public class CommandHandlerService implements CommandHandler {
         logger.info("HandlerCommand метод запущен");
 
 
-        Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
-        if (hasPhoto.isPresent()) {
-            GetFile getFile = new GetFile(hasPhoto.get().fileId());
-            File file = bot.execute(getFile).file();
-            bot.getFileContent(file);
-        }
-
-
         if (checkContains(MAIN_MENU_COMMANDS, command)) {
             handleMainCommands(chatId, command);
         } else if (checkContains(SUBMENU_NEW_USER, command)) {
             handleNewUserCommands(chatId, command);
         } else if (checkContains(SUBMENU_CONSULTATION, command)) {
             handleConsultationCommands(chatId, command);
-        }else if (checkContains(SUBMENU_ADOPTION, command)) {
+        } else if (checkContains(SUBMENU_ADOPTION, command)) {
             handleAdoptionCommands(chatId, command);
         } else if (checkContains(SUBMENU_DOG_HANDLER, command)) {
-                handleDogHandlerCommands(chatId, command);
+            handleDogHandlerCommands(chatId, command);
         } else {
             logger.info("обработка базовых команд");
 
@@ -118,7 +110,7 @@ public class CommandHandlerService implements CommandHandler {
                     break;
 
                 default:
-                    handleUserText(chatId, command);
+                    handleUserText(message);
             }
         }
 
@@ -151,7 +143,10 @@ public class CommandHandlerService implements CommandHandler {
                 break;
 
             case MAIN_COMMAND3:
-
+                menu.sendMenu(chatId,
+                        CHOOSE_REPORT,
+                        SUBMENU_REPORT,
+                        bot);
                 break;
 
             case MAIN_COMMAND4:
@@ -164,28 +159,6 @@ public class CommandHandlerService implements CommandHandler {
                         bot);
                 break;
         }
-    }
-
-    @Override
-    public void handleChooseShelter(Long chatId, String command) {
-        /*if (command.equals(CHOOSE_SHELTER_COMMAND1)) {
-            chatIdChosen = chatId;
-            chosenShelter = CHOSEN_DOGS;
-
-
-        } else if (command.equals(CHOOSE_SHELTER_COMMAND2)) {
-            chatIdChosen = chatId;
-            chosenShelter = CHOSEN_CATS;
-        } else {
-            menu.sendMenu(chatId,
-                    "Вы не выбрали приют!!!",
-                    CHOOSE_SHELTER_COMMANDS,
-                    bot);
-        }
-        menu.sendMenu(chatId,
-                "Что выберете",
-                MAIN_MENU_COMMANDS,
-                bot);*/
     }
 
 
@@ -327,6 +300,131 @@ public class CommandHandlerService implements CommandHandler {
     }
 
     @Override
+    public void handleReportCommands(Message message) {
+        Long chatId = message.chat().id();
+        String command = message.text();
+        switch (command) {
+            case REPORT_COMMAND1:
+                menu.sendMenu(chatId,
+                        "Введите информацию о питании питомца",
+                        SUBMENU_REPORT,
+                        bot);
+                break;
+            case REPORT_COMMAND2:
+                menu.sendMenu(chatId,
+                        "Введите информацию о самочувствии питомца",
+                        SUBMENU_REPORT,
+                        bot);
+                break;
+            case REPORT_COMMAND3:
+                menu.sendMenu(chatId,
+                        "Введите информацию о поведении питомца питомца",
+                        SUBMENU_REPORT,
+                        bot);
+                break;
+            case REPORT_COMMAND4:
+                menu.sendMenu(chatId,
+                        "Отправьте фото-отчет",
+                        SUBMENU_REPORT,
+                        bot);
+                break;
+            case MAIN_MENU:
+                menu.sendMenu(chatId,
+                        MAIN_MENU,
+                        MAIN_MENU_COMMANDS,
+                        bot);
+                break;
+            default:
+                if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND1)) {
+                    handleReportCommand1(chatId, command);
+                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND2)) {
+                    handleReportCommand2(chatId, command);
+                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND3)) {
+                    handleReportCommand3(chatId, command);
+                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND4)) {
+                    handleReportCommand4( message);
+                }
+                break;
+        }
+        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(MAIN_COMMAND3)) {
+
+        }
+    }
+
+
+    private void handleReportCommand1(Long chatId, String command) {
+        if (!command.isEmpty() & !command.isBlank()) {
+            report = new Report();
+            report.setDiet(command);
+        } else {
+            menu.sendMenu(chatId,
+                    "Нажмите еще раз на кнопку меню " + REPORT_COMMAND1 + " и введите отчет о питании питомца" +
+                            "корректно",
+                    SUBMENU_REPORT,
+                    bot);
+        }
+
+    }
+
+    private void handleReportCommand2(Long chatId, String command) {
+        if (!command.isEmpty() & !command.isBlank()) {
+            report.setWellbeing(command);
+        } else {
+            menu.sendMenu(chatId,
+                    "Нажмите еще раз на кнопку меню " + REPORT_COMMAND2 + " и введите отчет о самочувствии питомца" +
+                            "корректно",
+                    SUBMENU_REPORT,
+                    bot);
+        }
+
+    }
+
+    private void handleReportCommand3(Long chatId, String command) {
+        if (!command.isEmpty() & !command.isBlank()) {
+            report.setBehaviorChanges(command);
+        } else {
+            menu.sendMenu(chatId,
+                    "Нажмите еще раз на кнопку меню " + REPORT_COMMAND2 + " и введите отчет о поведении питомца" +
+                            "корректно",
+                    SUBMENU_REPORT,
+                    bot);
+        }
+
+    }
+
+    private void handleReportCommand4(Message message) {
+
+        Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
+        adoption = getThisClientAdoption(message.chat().id());
+        byte[] downloadedPhoto = null;
+        if (hasPhoto.isPresent() & message.text() != null) {
+            try {
+                downloadedPhoto = getPhotoFromMsg(hasPhoto, bot);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            report.setPhoto(downloadedPhoto);
+            report.setAdoption(adoption);
+            report.setReviewed(false);
+            report.setAnimal(adoption.getAnimal());
+            report.setDate(LocalDate.now());
+            reportService.saveReport(report);
+
+        } else {
+            menu.sendMenu(message.chat().id(),
+                    "Нажмите еще раз на кнопку меню " + REPORT_COMMAND4 + " и отправьте фото снова",
+                    SUBMENU_REPORT,
+                    bot);
+
+
+        }
+
+
+    }
+
+
+    @Override
     public void handleUserText(Message message) {
 
         Long chatId = message.chat().id();
@@ -357,22 +455,7 @@ public class CommandHandlerService implements CommandHandler {
                     new String[]{START_COMMAND},
                     bot);
         }
-        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(MAIN_COMMAND3)) {
-            Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
-            if (hasPhoto.isPresent()&command!=null) {
 
-                Report report = new Report();
-                report.setUser(new User());
-                report.setDate(LocalDate.now());
-                report.setDiet(command);
-                // не знаю, что значат поля
-                report.setPhoto(hasPhoto.get().);
-            } else if (!hasPhoto.isPresent()&command!=null) {
-
-            } else if (command==null&hasPhoto.isPresent()) {
-
-            }
-        }
 
     }
 
@@ -390,6 +473,24 @@ public class CommandHandlerService implements CommandHandler {
             sendPhoto.caption("Схема проезда к приюту");
             bot.execute(sendPhoto);
         }
+    }
+
+    private Adoptions getThisClientAdoption(Long chatId) {
+        // найдем усыновления с действующим подотчетным периодом
+        Optional<List<Adoptions>> currentAdoptionsOptional = adoptionService.findByProbationPeriodLessNow();
+        if (currentAdoptionsOptional.isPresent()) {
+            // Проверяем, есть ли у данного клиента усыновления
+            List<Adoptions> thisClientAdoptionsList = currentAdoptionsOptional.get().stream().
+                    filter(e -> Objects.equals(e.getClient().getChatId(), chatId)).
+                    toList();
+            // далее можно обработать все итерации, но в данной версии программы остановимся только
+            // на одном усыновлении, то есть у клиента может быть только одно усыновление
+            Adoptions thisClientAdoption = thisClientAdoptionsList.stream().findFirst().get();
+            return thisClientAdoption;
+
+
+        }
+        return null;
     }
 
 

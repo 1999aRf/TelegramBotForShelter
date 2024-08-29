@@ -3,10 +3,10 @@ package shelter.bot.botshelter.services;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
+import shelter.bot.botshelter.model.Client;
 import shelter.bot.botshelter.model.Report;
-import shelter.bot.botshelter.model.User;
+import shelter.bot.botshelter.repositories.AdoptionRepository;
 import shelter.bot.botshelter.repositories.ReportRepository;
-import shelter.bot.botshelter.repositories.UserRepository;
 import shelter.bot.botshelter.services.interfaces.ReportService;
 
 import java.time.LocalDate;
@@ -15,13 +15,13 @@ import java.util.Optional;
 
 @Service
 public class ReportServiceImpl implements ReportService {
-    private ReportRepository reportRepository;
-    private UserRepository userRepository;
-    private TelegramBot telegramBot;
+    private final ReportRepository reportRepository;
+    private final AdoptionRepository adoptionRepository;
+    private final TelegramBot telegramBot;
 
-    public ReportServiceImpl(ReportRepository reportRepository, UserRepository userRepository, TelegramBot telegramBot) {
+    public ReportServiceImpl(ReportRepository reportRepository, AdoptionRepository adoptionRepository, TelegramBot telegramBot) {
         this.reportRepository = reportRepository;
-        this.userRepository = userRepository;
+        this.adoptionRepository = adoptionRepository;
         this.telegramBot = telegramBot;
     }
 
@@ -52,17 +52,13 @@ public class ReportServiceImpl implements ReportService {
     public void sendWarning(Long reportId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
-        User user = report.getUser();
+        Client client = report.getAdoption().getClient();
 
         String warningMessage = "Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. " +
                 "Пожалуйста, подойди ответственнее к этому занятию. В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного.";
 
-        telegramBot.execute(new SendMessage(user.getChatId().toString(), warningMessage));
+        telegramBot.execute(new SendMessage(client.getChatId().toString(), warningMessage));
     }
 
-    @Override
-    public List<User> getUsersWithoutTodayReport() {
-        LocalDate today = LocalDate.now();
-        return userRepository.findUsersWithoutReportForDate(today);
-    }
+
 }

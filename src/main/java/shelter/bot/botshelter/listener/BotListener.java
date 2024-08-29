@@ -65,7 +65,7 @@ public class BotListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private void processUpdate(Update update) throws IOException {
+    private void processUpdate(Update update) {
         logger.info("Processing update: {}", update);
 
 
@@ -74,7 +74,11 @@ public class BotListener implements UpdatesListener {
         try {
             commandHandlerService.handleCommand(message);
         } catch (IOException ex) {
-            throw new IOException();
+            try {
+                throw new IOException(""+ex);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }

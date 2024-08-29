@@ -1,8 +1,10 @@
 package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -24,9 +26,12 @@ public class Adoptions {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    public Adoptions(LocalDateTime probationPeriod, int result, Animal animal, Client client) {
-        this.probationPeriod = probationPeriod;
-        this.result = result;
+    @OneToMany(mappedBy = "adoption")
+    private List<Report> reports;
+
+    public Adoptions( Animal animal, Client client) {
+        this.probationPeriod = LocalDateTime.now().plusDays(30);
+        this.result = 0;
         this.animal = animal;
         this.client = client;
     }

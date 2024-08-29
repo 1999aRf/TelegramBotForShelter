@@ -3,10 +3,13 @@ package shelter.bot.botshelter.services.interfaces;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.response.GetFileResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public interface CommandHandler {
@@ -66,6 +69,11 @@ public interface CommandHandler {
     public static final String ADOPTION_COMMAND3 = "Обустройство дома для взрослого питомца";
     public static final String ADOPTION_COMMAND4 = "Обустройство дома для питомца с ограниченными возможностями";
 
+    public static final String REPORT_COMMAND1 = "Отчет о питании питомца";
+    public static final String REPORT_COMMAND2 = "Отчет о самочувствии питомца";
+    public static final String REPORT_COMMAND3 = "Отчет о поведении питомца";
+    public static final String REPORT_COMMAND4 = "Фото-отчет";
+
     //--------------------------------------------------------------------------
     //              Наборы кнопок для соответствующего в названии меню
     //--------------------------------------------------------------------------
@@ -112,6 +120,13 @@ public interface CommandHandler {
             new String [] {DOG_HANDLER_MENU},
             new String [] {MAIN_MENU}
     };
+    public static final String[][] SUBMENU_REPORT = new String[][]{
+            new String [] {REPORT_COMMAND1},
+            new String [] {REPORT_COMMAND2},
+            new String [] {REPORT_COMMAND3},
+            new String [] {REPORT_COMMAND4},
+            new String [] {MAIN_MENU}
+    };
 
     //--------------------------------------------------------------------------
     //      Методы для обработки команд соответствующего в названии меню
@@ -134,14 +149,6 @@ public interface CommandHandler {
      */
     void handleMainCommands(Long chatId,String command);
 
-    /**
-     * Обработчик выбора пользователя об интересующем его приюте(для собак или кошек)<br>
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
-     * @param command - текущая команда, которую отправил пользователь
-     */
-    void handleChooseShelter(Long chatId,String command);
 
     /**
      * Обработчик команд меню, в котором пользователь может узнать различную информацию о
@@ -205,6 +212,19 @@ public interface CommandHandler {
      * @param command - текущая команда, которую отправил пользователь
      */
     void handleAdoptionCommands(Long chatId,String command);
+    /**
+     * Обработчик команд меню отчета, в котором пользователь, усыновивший питомца обязан отправлять достоверную
+     * информацию о: <br>
+     * - отчет о питании питомца{@code REPORT_COMMAND1},<br>
+     * - отчет о самочувствии питомца {@code REPORT_COMMAND2},<br>
+     * - отчет о поведении питомца{@code REPORT_COMMAND3},<br>
+     * - фото-отчет{@code REPORT_COMMAND4},<br>
+     * - возврат в главное меню{@code MAIN_MENU}.
+     *
+     *
+     * @param message - все содержимое сообщения
+     */
+    void handleReportCommands(Message message);
 
     /**
      * Метод проверяет, есть ли команда в соответствуюем меню.
@@ -230,10 +250,9 @@ public interface CommandHandler {
 
     /**
      * Метод для обработки команды {@code NEW_USER_COMMAND4} - принять данные для связи.
-     * @param chatId - идентификатор текущего чата
-     * @param command - введенный пользователем текст
+     * @param message - все содержимое сообщения
      */
-    void handleUserText(Long chatId,String command);
+    void handleUserText(Message message);
     /**
      * Метод валидации номера согласно маске {@code validNumber}
      * @param command - введенный текст пользователя
@@ -243,13 +262,17 @@ public interface CommandHandler {
         return validNumber.matcher(command).matches();
     }
 
-    default File getPhoto(Message message, TelegramBot bot) {
-        String fileId = Arrays.stream(message.photo()).findFirst().get().fileId();
-        GetFileResponse response = bot.execute(new GetFile(fileId));
-        return response.file();
+    default byte[] getPhotoFromMsg(Optional<PhotoSize> hasPhoto,TelegramBot bot) throws IOException {
+
+        if (hasPhoto.isPresent()) {
+            GetFile getFile = new GetFile(hasPhoto.get().fileId());
+            File file = bot.execute(getFile).file();
+            return bot.getFileContent(file);
+        } else {
+            return null;
+        }
+
     }
-
-
 
 
 

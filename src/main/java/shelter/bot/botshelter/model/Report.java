@@ -1,5 +1,6 @@
 package shelter.bot.botshelter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,17 +15,13 @@ public class Report {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne
     @JoinColumn(name = "animal_id", nullable = false)
     private Animal animal;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Lob
+    @JsonIgnore
     @Column(name = "photo")
     private byte[] photo;
 
@@ -40,12 +37,17 @@ public class Report {
     @Column(name = "is_reviewed", nullable = false)
     private boolean isReviewed;
 
+    @ManyToOne
+    @JoinColumn(name = "adoption_id")
+    private Adoptions adoption;
+
     public Report() {
+
+
     }
 
-    public Report(Long id, User user, Animal animal, LocalDate date, byte[] photo, String diet, String wellbeing, String behaviorChanges, boolean isReviewed) {
+    public Report(Long id, Animal animal, LocalDate date, byte[] photo, String diet, String wellbeing, String behaviorChanges, boolean isReviewed, Adoptions adoption) {
         this.id = id;
-        this.user = user;
         this.animal = animal;
         this.date = date;
         this.photo = photo;
@@ -53,6 +55,7 @@ public class Report {
         this.wellbeing = wellbeing;
         this.behaviorChanges = behaviorChanges;
         this.isReviewed = isReviewed;
+        this.adoption = adoption;
     }
 
     public Long getId() {
@@ -61,14 +64,6 @@ public class Report {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Animal getAnimal() {
@@ -127,24 +122,19 @@ public class Report {
         isReviewed = reviewed;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Report report = (Report) o;
-        return isReviewed == report.isReviewed && Objects.equals(id, report.id) && Objects.equals(user, report.user) && Objects.equals(animal, report.animal) && Objects.equals(date, report.date) && Objects.deepEquals(photo, report.photo) && Objects.equals(diet, report.diet) && Objects.equals(wellbeing, report.wellbeing) && Objects.equals(behaviorChanges, report.behaviorChanges);
+    public Adoptions getAdoption() {
+        return adoption;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, user, animal, date, Arrays.hashCode(photo), diet, wellbeing, behaviorChanges, isReviewed);
+    public void setAdoption(Adoptions adoption) {
+        this.adoption = adoption;
     }
+
 
     @Override
     public String toString() {
         return "Report{" +
                 "id=" + id +
-                ", user=" + user +
                 ", animal=" + animal +
                 ", date=" + date +
                 ", photo=" + Arrays.toString(photo) +
@@ -152,6 +142,22 @@ public class Report {
                 ", wellbeing='" + wellbeing + '\'' +
                 ", behaviorChanges='" + behaviorChanges + '\'' +
                 ", isReviewed=" + isReviewed +
+                ", adoption=" + adoption +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Report report = (Report) o;
+        return isReviewed == report.isReviewed && Objects.equals(id, report.id) && Objects.equals(animal, report.animal) && Objects.equals(date, report.date) && Objects.deepEquals(photo, report.photo) && Objects.equals(diet, report.diet) && Objects.equals(wellbeing, report.wellbeing) && Objects.equals(behaviorChanges, report.behaviorChanges) && Objects.equals(adoption, report.adoption);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, animal, date, Arrays.hashCode(photo), diet, wellbeing, behaviorChanges, isReviewed, adoption);
+    }
+
+
 }
