@@ -1,9 +1,13 @@
 package shelter.bot.botshelter.services;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +17,9 @@ import shelter.bot.botshelter.listener.BotListener;
 import shelter.bot.botshelter.model.*;
 import shelter.bot.botshelter.services.interfaces.CommandHandler;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,16 +36,18 @@ public class CommandHandlerService implements CommandHandler {
     private final VolunteerService volunteerService;
     private final ShelterService shelterService;
     private final AdoptionService adoptionService;
+    private final ReportServiceImpl reportService;
 
     private final TelegramBotConfiguration telegramBotConfiguration;
 
-    public CommandHandlerService(TelegramBot bot, Menu menu, ClientService clientService, VolunteerService volunteerService, ShelterService shelterService, AdoptionService adoptionService, TelegramBotConfiguration telegramBotConfiguration) {
+    public CommandHandlerService(TelegramBot bot, Menu menu, ClientService clientService, VolunteerService volunteerService, ShelterService shelterService, AdoptionService adoptionService, ReportServiceImpl reportService, TelegramBotConfiguration telegramBotConfiguration) {
         this.bot = bot;
         this.menu = menu;
         this.clientService = clientService;
         this.volunteerService = volunteerService;
         this.shelterService = shelterService;
         this.adoptionService = adoptionService;
+        this.reportService = reportService;
         this.telegramBotConfiguration = telegramBotConfiguration;
     }
 
@@ -46,12 +55,20 @@ public class CommandHandlerService implements CommandHandler {
     private long chatIdChosen; // хранит id чата, кто и выбрал приют с кошками или собаками*/
     private String prevCommand; // хранит название предыдущей команды
 
-    public void handleCommand(Message message) {
+    public void handleCommand(Message message) throws IOException {
 
         Long chatId = message.chat().id();
         String command = message.text();
 
         logger.info("HandlerCommand метод запущен");
+
+
+        Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
+        if (hasPhoto.isPresent()) {
+            GetFile getFile = new GetFile(hasPhoto.get().fileId());
+            File file = bot.execute(getFile).file();
+            bot.getFileContent(file);
+        }
 
 
         if (checkContains(MAIN_MENU_COMMANDS, command)) {
@@ -310,7 +327,10 @@ public class CommandHandlerService implements CommandHandler {
     }
 
     @Override
-    public void handleUserText(Long chatId, String command) {
+    public void handleUserText(Message message) {
+
+        Long chatId = message.chat().id();
+        String command = message.text();
         logger.info("обработка номера");
 
         // обработка номера. Если текущий текст предыдущая команда была "принять данные для связи",
@@ -337,6 +357,22 @@ public class CommandHandlerService implements CommandHandler {
                     new String[]{START_COMMAND},
                     bot);
         }
+        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(MAIN_COMMAND3)) {
+            Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
+            if (hasPhoto.isPresent()&command!=null) {
+
+                Report report = new Report();
+                report.setUser(new User());
+                report.setDate(LocalDate.now());
+                report.setDiet(command);
+                // не знаю, что значат поля
+                report.setPhoto(hasPhoto.get().);
+            } else if (!hasPhoto.isPresent()&command!=null) {
+
+            } else if (command==null&hasPhoto.isPresent()) {
+
+            }
+        }
 
     }
 
@@ -355,4 +391,6 @@ public class CommandHandlerService implements CommandHandler {
             bot.execute(sendPhoto);
         }
     }
+
+
 }

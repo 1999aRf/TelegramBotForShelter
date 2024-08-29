@@ -1,9 +1,12 @@
 package shelter.bot.botshelter.services.interfaces;
 
-import java.util.ArrayList;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.response.GetFileResponse;
+
 import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface CommandHandler {
@@ -222,7 +225,7 @@ public interface CommandHandler {
     }
 
     //--------------------------------------------------------------------------
-    //              Методы для обработки текста пользователя
+    //              Методы для обработки сообщений пользователя
     //--------------------------------------------------------------------------
 
     /**
@@ -238,6 +241,12 @@ public interface CommandHandler {
      */
     default boolean validateNumber(String command) {
         return validNumber.matcher(command).matches();
+    }
+
+    default File getPhoto(Message message, TelegramBot bot) {
+        String fileId = Arrays.stream(message.photo()).findFirst().get().fileId();
+        GetFileResponse response = bot.execute(new GetFile(fileId));
+        return response.file();
     }
 
 

@@ -3,9 +3,12 @@ package shelter.bot.botshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -17,6 +20,8 @@ import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -60,14 +65,18 @@ public class BotListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private void processUpdate(Update update) {
+    private void processUpdate(Update update) throws IOException {
         logger.info("Processing update: {}", update);
 
 
         Message message = update.message();
 
+        try {
+            commandHandlerService.handleCommand(message);
+        } catch (IOException ex) {
+            throw new IOException();
+        }
 
-        commandHandlerService.handleCommand(message);
     }
 
     private void sendMessage(Long chatId, String message) {

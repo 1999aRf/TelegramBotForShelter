@@ -27,6 +27,8 @@ public class User {
     @Column(name = "status")
     private String status;  // можно использовать Enum для статуса
 
+
+
     public Long getId() {
         return id;
     }
