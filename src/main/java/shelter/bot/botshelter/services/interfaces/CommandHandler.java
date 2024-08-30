@@ -262,18 +262,6 @@ public interface CommandHandler {
         return validNumber.matcher(command).matches();
     }
 
-    default byte[] getPhotoFromMsg(Optional<PhotoSize> hasPhoto,TelegramBot bot) throws IOException {
-
-        if (hasPhoto.isPresent()) {
-            GetFile getFile = new GetFile(hasPhoto.get().fileId());
-            File file = bot.execute(getFile).file();
-            return bot.getFileContent(file);
-        } else {
-            return null;
-        }
-
-    }
-
 
 
 }

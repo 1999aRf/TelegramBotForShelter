@@ -2,15 +2,17 @@ package shelter.bot.botshelter.services;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
+import shelter.bot.botshelter.exceptions.DownloadPhotoException;
 import shelter.bot.botshelter.listener.BotListener;
 import shelter.bot.botshelter.model.*;
 import shelter.bot.botshelter.services.interfaces.CommandHandler;
@@ -23,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static shelter.bot.botshelter.constants.Texts.*;
+
 @Singleton
 @Service
 public class CommandHandlerService implements CommandHandler {
@@ -55,13 +58,12 @@ public class CommandHandlerService implements CommandHandler {
     private Adoptions adoption;
 
 
-    public void handleCommand(Message message) throws IOException {
+    public void handleCommand(Message message)  {
 
         Long chatId = message.chat().id();
         String command = message.text();
 
-        logger.info("HandlerCommand метод запущен");
-
+        logger.info("Обработчик команд запущен для чата: {}",chatId);
 
         if (checkContains(MAIN_MENU_COMMANDS, command)) {
             handleMainCommands(chatId, command);
@@ -74,7 +76,7 @@ public class CommandHandlerService implements CommandHandler {
         } else if (checkContains(SUBMENU_DOG_HANDLER, command)) {
             handleDogHandlerCommands(chatId, command);
         } else {
-            logger.info("обработка базовых команд");
+            logger.info("Обработчик базовых команд запущен для чата: {}",chatId);
 
             switch (command) {
 
@@ -117,10 +119,6 @@ public class CommandHandlerService implements CommandHandler {
         prevCommand = command;
     }
 
-    private Optional<Volunteer> getVolunteer() {
-        return volunteerService.findById(1);
-    }
-
     // Универсальный метод для отправки сообщения
     private void sendMessage(Long chatId, String messageText) {
         SendResponse response = bot.execute(new SendMessage(chatId, messageText));
@@ -131,7 +129,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleMainCommands(Long chatId, String command) {
-
+        logger.info("Обработчик команд главного меню запущен для чата: {}",chatId);
         switch (command) {
             case MAIN_COMMAND1:
 
@@ -164,7 +162,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleNewUserCommands(Long chatId, String command) {
-
+        logger.info("Обработчик команд для пользователя запущен для чата: {}",chatId);
         switch (command) {
             case NEW_USER_COMMAND1:
 
@@ -202,6 +200,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleConsultationCommands(Long chatId, String command) {
+        logger.info("Обработчик команд меню консультации запущен для чата: {}",chatId);
         switch (command) {
             case CONSULTATION_COMMAND1:
 
@@ -243,6 +242,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleDogHandlerCommands(Long chatId, String command) {
+        logger.info("Обработчик команд меню рекомендаций кинолога запущен для чата: {}",chatId);
         switch (command) {
             case DOG_HANDLER_COMMAND1:
                 sendMessage(chatId, DOG_HANDLERS_RECOMMENDATIONS);
@@ -266,6 +266,7 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleAdoptionCommands(Long chatId, String command) {
+        logger.info("Обработчик команд меню для усыновления запущен для чата: {}",chatId);
         switch (command) {
             case ADOPTION_COMMAND1:
                 sendMessage(chatId, RULES_ANIMAL_TRANSPORTATION);
@@ -342,7 +343,12 @@ public class CommandHandlerService implements CommandHandler {
                 } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND3)) {
                     handleReportCommand3(chatId, command);
                 } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND4)) {
-                    handleReportCommand4( message);
+                    try {
+                        handleReportCommand4(message);
+                    } catch (DownloadPhotoException ex) {
+                        logger.error("Ошибка при загрузке фото для чата {}: {}", chatId, ex.getMessage());
+                    }
+
                 }
                 break;
         }
@@ -392,35 +398,36 @@ public class CommandHandlerService implements CommandHandler {
 
     }
 
-    private void handleReportCommand4(Message message) {
-
-        Optional<PhotoSize> hasPhoto = Arrays.stream(message.photo()).findAny();
-        adoption = getThisClientAdoption(message.chat().id());
-        byte[] downloadedPhoto = null;
-        if (hasPhoto.isPresent() & message.text() != null) {
-            try {
-                downloadedPhoto = getPhotoFromMsg(hasPhoto, bot);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    private void handleReportCommand4(Message message) throws DownloadPhotoException {
+        if (message.photo() != null && message.photo().length > 0) {
+            logger.info("Получено фото для фото-отчета для чата{}. На очереди скачивание файла для сохранения в БД", message.chat().id());
+            GetFileResponse response = bot.execute(new GetFile(Arrays.stream(message.photo()).findFirst().get().fileId()));
+            logger.info("Ответ на получение скачивание фото:{}", response);
+            if (response.isOk()) {
+                try {
+                    byte[] image = bot.getFileContent(response.file());
+                    report.setPhoto(image);
+                    report.setAdoption(adoption);
+                    report.setReviewed(false);
+                    report.setAnimal(adoption.getAnimal());
+                    report.setDate(LocalDate.now());
+                    reportService.saveReport(report);
+                } catch (IOException ex) {
+                    logger.error("Ошибка при обработке фото для чата {}: {}", message.chat().id(), ex.getMessage());
+                    sendMessage(message.chat().id(), "Простите, произошла ошибка при обработке фото. Пожалуйста, попробуйте еще раз.");
+                }
+            } else {
+                logger.error("Не удалось получить файл фото: {}", response.errorCode());
+                sendMessage(message.chat().id(), "Произошла ошибка при получении файла фото. Попробуйте еще раз.");
             }
 
-            report.setPhoto(downloadedPhoto);
-            report.setAdoption(adoption);
-            report.setReviewed(false);
-            report.setAnimal(adoption.getAnimal());
-            report.setDate(LocalDate.now());
-            reportService.saveReport(report);
-
         } else {
+            logger.info("Сообщение не содержит фото для чата {}", message.chat().id());
             menu.sendMenu(message.chat().id(),
                     "Нажмите еще раз на кнопку меню " + REPORT_COMMAND4 + " и отправьте фото снова",
                     SUBMENU_REPORT,
                     bot);
-
-
         }
-
-
     }
 
 
@@ -429,7 +436,7 @@ public class CommandHandlerService implements CommandHandler {
 
         Long chatId = message.chat().id();
         String command = message.text();
-        logger.info("обработка номера");
+        logger.info("Обработка текста для чата : {}", message.chat().id());
 
         // обработка номера. Если текущий текст предыдущая команда была "принять данные для связи",
         // то следует проверка на соответствие маске и сохранение номера для соответствующего клиента
@@ -443,11 +450,8 @@ public class CommandHandlerService implements CommandHandler {
                         NUMBER_SAVED_SUCCESS,
                         SUBMENU_NEW_USER,
                         bot);
-                return;
-
             } else {
                 sendMessage(chatId, "Введите корректный номер согласно маске +7-9**-***-**-");
-
             }
         } else {
             menu.sendMenu(chatId,
@@ -455,8 +459,6 @@ public class CommandHandlerService implements CommandHandler {
                     new String[]{START_COMMAND},
                     bot);
         }
-
-
     }
 
 
@@ -487,8 +489,6 @@ public class CommandHandlerService implements CommandHandler {
             // на одном усыновлении, то есть у клиента может быть только одно усыновление
             Adoptions thisClientAdoption = thisClientAdoptionsList.stream().findFirst().get();
             return thisClientAdoption;
-
-
         }
         return null;
     }

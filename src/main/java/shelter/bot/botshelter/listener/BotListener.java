@@ -67,20 +67,8 @@ public class BotListener implements UpdatesListener {
 
     private void processUpdate(Update update) {
         logger.info("Processing update: {}", update);
-
-
         Message message = update.message();
-
-        try {
             commandHandlerService.handleCommand(message);
-        } catch (IOException ex) {
-            try {
-                throw new IOException(""+ex);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
     private void sendMessage(Long chatId, String message) {
