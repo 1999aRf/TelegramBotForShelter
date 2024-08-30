@@ -233,7 +233,7 @@ public interface CommandHandler {
      * @return - {@code true}- если есть, {@code false} - если нет такой команды
      */
     default boolean checkContains(String[][] buttonsArray,String command){
-        if (command.equals(CALL_VOLUNTEER)) {
+        if (command==null) {
             return false;
         }
         for (int i = 0; i < buttonsArray.length; i++) {
@@ -252,7 +252,7 @@ public interface CommandHandler {
      * Метод для обработки команды {@code NEW_USER_COMMAND4} - принять данные для связи.
      * @param message - все содержимое сообщения
      */
-    void handleUserText(Message message);
+    void handleUserMessage(Message message);
     /**
      * Метод валидации номера согласно маске {@code validNumber}
      * @param command - введенный текст пользователя

@@ -1,5 +1,6 @@
 package shelter.bot.botshelter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.w3c.dom.stylesheets.LinkStyle;
 
@@ -7,30 +8,38 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Класс сущности усыновлений. Предполагает для клиента иметь несколько усыновлений, однако
+ * данная версия программы может обработать только одно усыновление
+ */
 @Entity
 @Table(name = "adoptions")
 public class Adoptions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "probation_period")
     private LocalDateTime probationPeriod;
     @Column(name = "result")
     private int result;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "animal_id")
     private Animal animal;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToMany(mappedBy = "adoption")
+
+    @OneToMany(mappedBy = "adoption",fetch = FetchType.EAGER)
     private List<Report> reports;
 
     public Adoptions( Animal animal, Client client) {
-        this.probationPeriod = LocalDateTime.now().plusDays(30);
+        this.probationPeriod = LocalDateTime.now().plusDays(30L);
         this.result = 0;
         this.animal = animal;
         this.client = client;

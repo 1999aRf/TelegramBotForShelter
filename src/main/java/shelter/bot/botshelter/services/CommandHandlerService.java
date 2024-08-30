@@ -19,6 +19,7 @@ import shelter.bot.botshelter.services.interfaces.CommandHandler;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -58,12 +59,12 @@ public class CommandHandlerService implements CommandHandler {
     private Adoptions adoption;
 
 
-    public void handleCommand(Message message)  {
+    public void handleCommand(Message message) {
 
         Long chatId = message.chat().id();
         String command = message.text();
 
-        logger.info("Обработчик команд запущен для чата: {}",chatId);
+        logger.info("Обработчик команд запущен для чата: {}", chatId);
 
         if (checkContains(MAIN_MENU_COMMANDS, command)) {
             handleMainCommands(chatId, command);
@@ -75,48 +76,52 @@ public class CommandHandlerService implements CommandHandler {
             handleAdoptionCommands(chatId, command);
         } else if (checkContains(SUBMENU_DOG_HANDLER, command)) {
             handleDogHandlerCommands(chatId, command);
+        } else if (checkContains(SUBMENU_REPORT, command)) {
+            handleReportCommands(message);
         } else {
-            logger.info("Обработчик базовых команд запущен для чата: {}",chatId);
+            logger.info("Обработчик базовых команд запущен для чата: {}", chatId);
 
-            switch (command) {
+            if (command != null) {
+                switch (command) {
 
-                case START_COMMAND:
-                    Optional<Client> optional = clientService.findByChatId(chatId);
-                    if (optional.isEmpty()) {
-                        clientService.saveClient(new Client(
-                                chatId, //идентификатор чата
-                                message.from().firstName() + message.from().lastName()) // полное имя клиента
-                        );
-                        menu.sendMenu(chatId,
-                                telegramBotConfiguration.getStartMsg(),
-                                MAIN_MENU_COMMANDS, bot);
-                    } else {
-                        menu.sendMenu(chatId, ASKING_TO_CHOOSE, SUBMENU_NEW_USER, bot);
-                    }
-                    ;
-                    break;
-                case CALL_VOLUNTEER:
-                    logger.info(CALL_VOLUNTEER + " команда запущена");
+                    case START_COMMAND:
+                        Optional<Client> optional = clientService.findByChatId(chatId);
+                        if (optional.isEmpty()) {
+                            clientService.saveClient(new Client(
+                                    chatId, //идентификатор чата
+                                    message.from().firstName() + message.from().lastName()) // полное имя клиента
+                            );
+                            menu.sendMenu(chatId,
+                                    telegramBotConfiguration.getStartMsg(),
+                                    MAIN_MENU_COMMANDS, bot);
+                        } else {
+                            menu.sendMenu(chatId, ASKING_TO_CHOOSE, SUBMENU_NEW_USER, bot);
+                        }
+                        ;
+                        break;
+                    case CALL_VOLUNTEER:
+                        logger.info(CALL_VOLUNTEER + " команда запущена");
 
-                    Optional<List<Volunteer>> optional1 = volunteerService.findAll();
+                        Optional<List<Volunteer>> optional1 = volunteerService.findAll();
 
-                    if (optional1.isPresent()) {
-                        logger.info(CALL_VOLUNTEER + " в списке найдены волонтеры");
-                        Volunteer volunteer = optional1.get().get(0);
-                        sendMessage(chatId, volunteer.toString());
+                        if (optional1.isPresent()) {
+                            logger.info(CALL_VOLUNTEER + " в списке найдены волонтеры");
+                            Volunteer volunteer = optional1.get().get(0);
+                            sendMessage(chatId, volunteer.toString());
 
-                    } else {
-                        sendMessage(chatId, "Волонтеры" + NOT_FOUND);
-                        logger.info("волонтеров на самом деле нет");
-                    }
-                    break;
+                        } else {
+                            sendMessage(chatId, "Волонтеры" + NOT_FOUND);
+                            logger.info("волонтеров на самом деле нет");
+                        }
+                        break;
 
-                default:
-                    handleUserText(message);
+
+                }
             }
+            handleUserMessage(message);
+
         }
 
-        prevCommand = command;
     }
 
     // Универсальный метод для отправки сообщения
@@ -129,15 +134,15 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleMainCommands(Long chatId, String command) {
-        logger.info("Обработчик команд главного меню запущен для чата: {}",chatId);
+        logger.info("Обработчик команд главного меню запущен для чата: {}", chatId);
         switch (command) {
             case MAIN_COMMAND1:
-
                 menu.sendMenu(chatId, SHElTER_DOG_INFO, SUBMENU_NEW_USER, bot);
-
+                prevCommand = MAIN_COMMAND1;
                 break;
             case MAIN_COMMAND2:
                 menu.sendMenu(chatId, CONSULTATION_MENU, SUBMENU_CONSULTATION, bot);
+                prevCommand = MAIN_COMMAND2;
                 break;
 
             case MAIN_COMMAND3:
@@ -145,6 +150,7 @@ public class CommandHandlerService implements CommandHandler {
                         CHOOSE_REPORT,
                         SUBMENU_REPORT,
                         bot);
+                prevCommand = MAIN_COMMAND3;
                 break;
 
             case MAIN_COMMAND4:
@@ -155,14 +161,16 @@ public class CommandHandlerService implements CommandHandler {
                         "Какое животное желаете приютить?",
                         CHOOSE_SHELTER_COMMANDS,
                         bot);
+                prevCommand = CHOSE_MENU;
                 break;
         }
+
     }
 
 
     @Override
     public void handleNewUserCommands(Long chatId, String command) {
-        logger.info("Обработчик команд для пользователя запущен для чата: {}",chatId);
+        logger.info("Обработчик команд для пользователя запущен для чата: {}", chatId);
         switch (command) {
             case NEW_USER_COMMAND1:
 
@@ -172,35 +180,34 @@ public class CommandHandlerService implements CommandHandler {
                         "Расписание: " + shelter.getBusinessTime(),
                         SUBMENU_NEW_USER,
                         bot);
-
-
+                prevCommand = NEW_USER_COMMAND1;
                 break;
             case NEW_USER_COMMAND2:
-
-
                 sendShelterInfo(chatId, shelterService.getShelterById(1L).get());
                 menu.sendMenu(chatId, "Можем вам предложить", SUBMENU_NEW_USER, bot);
-
-
+                prevCommand = NEW_USER_COMMAND2;
                 break;
 
             case NEW_USER_COMMAND3:
                 menu.sendMenu(chatId, SAFETY_RULES, SUBMENU_NEW_USER, bot);
+                prevCommand = NEW_USER_COMMAND3;
                 break;
             case NEW_USER_COMMAND4:
                 sendMessage(chatId, "Введите номер согласно маске +7-9**-***-**-");
+                prevCommand = NEW_USER_COMMAND4;
                 break;
             case MAIN_MENU:
                 menu.sendMenu(chatId,
                         "Что выберете",
                         MAIN_MENU_COMMANDS, bot);
+                prevCommand = MAIN_MENU;
                 break;
         }
     }
 
     @Override
     public void handleConsultationCommands(Long chatId, String command) {
-        logger.info("Обработчик команд меню консультации запущен для чата: {}",chatId);
+        logger.info("Обработчик команд меню консультации запущен для чата: {}", chatId);
         switch (command) {
             case CONSULTATION_COMMAND1:
 
@@ -222,43 +229,50 @@ public class CommandHandlerService implements CommandHandler {
                     sendMessage(chatId, SHELTER_IS_NOT_AVAILABLE);
 
                 }
+                prevCommand = CONSULTATION_COMMAND1;
                 break;
             case CONSULTATION_COMMAND2:
                 sendMessage(chatId, RULES_OF_ACQUAINTANCE_AND_ADOPTION);
-
+                prevCommand = CONSULTATION_COMMAND2;
                 break;
 
             case CONSULTATION_COMMAND3:
                 sendMessage(chatId, NEEDED_DOCS);
+                prevCommand = CONSULTATION_COMMAND3;
                 break;
             case CONSULTATION_COMMAND4:
                 menu.sendMenu(chatId,
                         "Доступный список рекомендаций",
                         SUBMENU_ADOPTION,
                         bot);
+                prevCommand = CONSULTATION_COMMAND4;
                 break;
         }
     }
 
     @Override
     public void handleDogHandlerCommands(Long chatId, String command) {
-        logger.info("Обработчик команд меню рекомендаций кинолога запущен для чата: {}",chatId);
+        logger.info("Обработчик команд меню рекомендаций кинолога запущен для чата: {}", chatId);
         switch (command) {
             case DOG_HANDLER_COMMAND1:
                 sendMessage(chatId, DOG_HANDLERS_RECOMMENDATIONS);
+                prevCommand = DOG_HANDLER_COMMAND1;
                 break;
             case DOG_HANDLER_COMMAND2:
                 sendMessage(chatId, DOG_HANDLER_LIST);
+                prevCommand = DOG_HANDLER_COMMAND2;
                 break;
 
             case DOG_HANDLER_COMMAND3:
                 sendMessage(chatId, REASONS_FOR_REFUSAL);
+                prevCommand = DOG_HANDLER_COMMAND3;
                 break;
             case CONSULTATION_MENU:
                 menu.sendMenu(chatId,
                         CONSULTATION_MENU,
                         SUBMENU_CONSULTATION,
                         bot);
+                prevCommand = CONSULTATION_MENU;
                 break;
 
         }
@@ -266,35 +280,39 @@ public class CommandHandlerService implements CommandHandler {
 
     @Override
     public void handleAdoptionCommands(Long chatId, String command) {
-        logger.info("Обработчик команд меню для усыновления запущен для чата: {}",chatId);
+        logger.info("Обработчик команд меню для усыновления запущен для чата: {}", chatId);
         switch (command) {
             case ADOPTION_COMMAND1:
                 sendMessage(chatId, RULES_ANIMAL_TRANSPORTATION);
-
+                prevCommand = ADOPTION_COMMAND1;
                 break;
             case ADOPTION_COMMAND2:
                 sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_PUPPY);
-
+                prevCommand = ADOPTION_COMMAND2;
                 break;
 
             case ADOPTION_COMMAND3:
                 sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_GROWNUPS);
+                prevCommand = ADOPTION_COMMAND3;
                 break;
 
             case ADOPTION_COMMAND4:
                 sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_DISABLED);
+                prevCommand = ADOPTION_COMMAND4;
                 break;
             case DOG_HANDLER_MENU:
                 menu.sendMenu(chatId,
                         DOG_HANDLER_MENU,
                         SUBMENU_DOG_HANDLER,
                         bot);
+                prevCommand = DOG_HANDLER_MENU;
                 break;
             case MAIN_MENU:
                 menu.sendMenu(chatId,
                         MAIN_MENU,
                         MAIN_MENU_COMMANDS,
                         bot);
+                prevCommand = MAIN_MENU;
                 break;
 
         }
@@ -310,58 +328,61 @@ public class CommandHandlerService implements CommandHandler {
                         "Введите информацию о питании питомца",
                         SUBMENU_REPORT,
                         bot);
+                prevCommand = REPORT_COMMAND1;
                 break;
             case REPORT_COMMAND2:
                 menu.sendMenu(chatId,
                         "Введите информацию о самочувствии питомца",
                         SUBMENU_REPORT,
                         bot);
+                prevCommand = REPORT_COMMAND2;
                 break;
             case REPORT_COMMAND3:
                 menu.sendMenu(chatId,
                         "Введите информацию о поведении питомца питомца",
                         SUBMENU_REPORT,
                         bot);
+                prevCommand = REPORT_COMMAND3;
                 break;
             case REPORT_COMMAND4:
                 menu.sendMenu(chatId,
                         "Отправьте фото-отчет",
                         SUBMENU_REPORT,
                         bot);
+                prevCommand = REPORT_COMMAND4;
                 break;
             case MAIN_MENU:
                 menu.sendMenu(chatId,
                         MAIN_MENU,
                         MAIN_MENU_COMMANDS,
                         bot);
+                prevCommand = MAIN_MENU;
                 break;
             default:
-                if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND1)) {
-                    handleReportCommand1(chatId, command);
-                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND2)) {
-                    handleReportCommand2(chatId, command);
-                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND3)) {
-                    handleReportCommand3(chatId, command);
-                } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND4)) {
-                    try {
-                        handleReportCommand4(message);
-                    } catch (DownloadPhotoException ex) {
-                        logger.error("Ошибка при загрузке фото для чата {}: {}", chatId, ex.getMessage());
-                    }
 
-                }
                 break;
         }
-        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(MAIN_COMMAND3)) {
 
-        }
     }
 
 
     private void handleReportCommand1(Long chatId, String command) {
         if (!command.isEmpty() & !command.isBlank()) {
+            Optional<List<Adoptions>> byProbationPeriodLessNow = adoptionService.findByProbationPeriodLessNow();
+            if (byProbationPeriodLessNow.isEmpty()) {
+                menu.sendMenu(chatId,
+                        "У вас нет действующих усыновлений",
+                        MAIN_MENU_COMMANDS,
+                        bot);
+                return;
+            }
+            List<Adoptions> adoptionListForThisClient = byProbationPeriodLessNow.get().stream().filter(e -> Objects.equals(e.getClient().getChatId(), chatId)).toList();
+            // используется только одно усыновление
+            adoption = adoptionListForThisClient.get(0);
             report = new Report();
             report.setDiet(command);
+            logger.info("Отчет о питании успешно сохранен");
+            sendMessage(chatId,"Отчет о питании успешно сохранен. Выберете следующий пункт меню");
         } else {
             menu.sendMenu(chatId,
                     "Нажмите еще раз на кнопку меню " + REPORT_COMMAND1 + " и введите отчет о питании питомца" +
@@ -369,12 +390,15 @@ public class CommandHandlerService implements CommandHandler {
                     SUBMENU_REPORT,
                     bot);
         }
+        prevCommand = REPORT_COMMAND1;
 
     }
 
     private void handleReportCommand2(Long chatId, String command) {
         if (!command.isEmpty() & !command.isBlank()) {
             report.setWellbeing(command);
+            logger.info("Отчет о сапочувствии успешно сохранен");
+            sendMessage(chatId,"Отчет о самочувствии успешно сохранен. Выберете следующий пункт меню");
         } else {
             menu.sendMenu(chatId,
                     "Нажмите еще раз на кнопку меню " + REPORT_COMMAND2 + " и введите отчет о самочувствии питомца" +
@@ -382,12 +406,14 @@ public class CommandHandlerService implements CommandHandler {
                     SUBMENU_REPORT,
                     bot);
         }
-
+        prevCommand = REPORT_COMMAND2;
     }
 
     private void handleReportCommand3(Long chatId, String command) {
         if (!command.isEmpty() & !command.isBlank()) {
             report.setBehaviorChanges(command);
+            logger.info("Отчет о поведении успешно сохранен");
+            sendMessage(chatId,"Отчет о поведении успешно сохранен. Выберете следующий пункт меню");
         } else {
             menu.sendMenu(chatId,
                     "Нажмите еще раз на кнопку меню " + REPORT_COMMAND2 + " и введите отчет о поведении питомца" +
@@ -395,7 +421,7 @@ public class CommandHandlerService implements CommandHandler {
                     SUBMENU_REPORT,
                     bot);
         }
-
+        prevCommand = REPORT_COMMAND3;
     }
 
     private void handleReportCommand4(Message message) throws DownloadPhotoException {
@@ -403,15 +429,17 @@ public class CommandHandlerService implements CommandHandler {
             logger.info("Получено фото для фото-отчета для чата{}. На очереди скачивание файла для сохранения в БД", message.chat().id());
             GetFileResponse response = bot.execute(new GetFile(Arrays.stream(message.photo()).findFirst().get().fileId()));
             logger.info("Ответ на получение скачивание фото:{}", response);
+            byte[] image;
             if (response.isOk()) {
                 try {
-                    byte[] image = bot.getFileContent(response.file());
+                    image = bot.getFileContent(response.file());
                     report.setPhoto(image);
                     report.setAdoption(adoption);
                     report.setReviewed(false);
-                    report.setAnimal(adoption.getAnimal());
-                    report.setDate(LocalDate.now());
+                    report.setDate(LocalDateTime.now());
                     reportService.saveReport(report);
+                    logger.info("Фото-отчет успешно сохранен");
+                    sendMessage(message.chat().id(),"Фото-отчет успешно сохранен");
                 } catch (IOException ex) {
                     logger.error("Ошибка при обработке фото для чата {}: {}", message.chat().id(), ex.getMessage());
                     sendMessage(message.chat().id(), "Простите, произошла ошибка при обработке фото. Пожалуйста, попробуйте еще раз.");
@@ -428,20 +456,33 @@ public class CommandHandlerService implements CommandHandler {
                     SUBMENU_REPORT,
                     bot);
         }
+        prevCommand = REPORT_COMMAND4;
     }
 
 
     @Override
-    public void handleUserText(Message message) {
+    public void handleUserMessage(Message message) {
 
         Long chatId = message.chat().id();
         String command = message.text();
         logger.info("Обработка текста для чата : {}", message.chat().id());
+        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND1)) {
+            handleReportCommand1(chatId, command);
+        } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND2)) {
+            handleReportCommand2(chatId, command);
+        } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND3)) {
+            handleReportCommand3(chatId, command);
+        } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND4)) {
+            try {
+                handleReportCommand4(message);
+            } catch (DownloadPhotoException ex) {
+                logger.error("Ошибка при загрузке фото для чата {}: {}", chatId, ex.getMessage());
+            }
 
-        // обработка номера. Если текущий текст предыдущая команда была "принять данные для связи",
+        } // обработка номера. Если текущий текст предыдущая команда была "принять данные для связи",
         // то следует проверка на соответствие маске и сохранение номера для соответствующего клиента
         // иначе код будет расценивать команду недействительной и отправит пользователя на старт
-        if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(NEW_USER_COMMAND4)) {
+        else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(NEW_USER_COMMAND4)) {
             if (validateNumber(command)) {
                 Client client = clientService.findByChatId(chatId).get();
                 client.setContactNumber(command);
@@ -454,11 +495,16 @@ public class CommandHandlerService implements CommandHandler {
                 sendMessage(chatId, "Введите корректный номер согласно маске +7-9**-***-**-");
             }
         } else {
-            menu.sendMenu(chatId,
-                    telegramBotConfiguration.getStartMsg(),
-                    new String[]{START_COMMAND},
-                    bot);
+            if (!message.text().equals(START_COMMAND)) {
+                menu.sendMenu(chatId,
+                        telegramBotConfiguration.getStartMsg(),
+                        new String[]{START_COMMAND},
+                        bot);
+            }
+
         }
+
+
     }
 
 

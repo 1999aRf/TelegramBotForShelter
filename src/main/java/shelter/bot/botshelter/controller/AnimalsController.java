@@ -10,7 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelter.bot.botshelter.model.Animal;
+import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.AnimalService;
+import shelter.bot.botshelter.services.ShelterService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +28,12 @@ import java.util.Optional;
 @Tag(name = "Animal", description = "API для работы с питомцами")
 public class AnimalsController {
 
-    private final AnimalService service;
+    private final AnimalService animalService;
+    private final ShelterService shelterService;
 
-    public AnimalsController(AnimalService service) {
-        this.service = service;
+    public AnimalsController(AnimalService animalService, ShelterService shelterService) {
+        this.animalService = animalService;
+        this.shelterService = shelterService;
     }
 
     /**
@@ -55,7 +59,43 @@ public class AnimalsController {
         if (animal == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(service.add(animal));
+        return ResponseEntity.ok(animalService.add(animal));
+    }
+/**
+     * Эндпоинт добавляет питомца в базу данных. Принимает объект класса (@code Animal) <br>
+     * , куда входят все необходимые его данные для связи с ним
+     *
+     * @param shelterId - идентификатор приюта {@code Shelter}
+     */
+
+    @Operation(summary = "Привязка питомца к приюту",
+            description = "Метод добавляет id приюта питомцу",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Питомец успешно привязан к приюту",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Animal.class))),
+                    @ApiResponse(responseCode = "404", description = "Данные не найдены", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
+    @PostMapping("/addShelter/{animalId}/{shelterId}")
+    public ResponseEntity<Animal> addShelterForAnimal(@PathVariable Long animalId,@PathVariable Long shelterId ) {
+        Optional<Shelter> shelterOptional = shelterService.getShelterById(shelterId);
+        Optional<Animal> animalOptional = animalService.findById(animalId);
+        Animal animal;
+        Shelter shelter;
+        if (animalOptional.isPresent()) {
+             animal = animalOptional.get();
+        } else {
+            return ResponseEntity.notFound().header("Питомец","не найден").build();
+        }
+        if (shelterOptional.isPresent()) {
+            shelter = shelterOptional.get();
+        } else {
+            return ResponseEntity.notFound().header("Приют","не найден").build();
+        }
+        animal.setShelter(shelter);
+        return ResponseEntity.ok(animalService.edit(animal));
     }
 
     /**
@@ -77,10 +117,10 @@ public class AnimalsController {
             })
     @PutMapping
     public ResponseEntity<Animal> putAnimal(@RequestBody Animal animal) {
-        if (service.findById(animal.getId()).isEmpty()) {
+        if (animalService.findById(animal.getId()).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(service.edit(animal));
+        return ResponseEntity.ok(animalService.edit(animal));
     }
 
     /**
@@ -102,7 +142,7 @@ public class AnimalsController {
             })
     @GetMapping("/{id}")
     public ResponseEntity<Animal> findById(@PathVariable Long id) {
-        Optional<Animal> animal = service.findById(id);
+        Optional<Animal> animal = animalService.findById(id);
         return animal.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -122,7 +162,7 @@ public class AnimalsController {
             })
     @GetMapping("/getAll")
     public ResponseEntity<List<Animal>> findAll() {
-        Optional<List<Animal>> optional = service.findAll();
+        Optional<List<Animal>> optional = animalService.findAll();
         return optional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -141,7 +181,7 @@ public class AnimalsController {
             })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+        animalService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

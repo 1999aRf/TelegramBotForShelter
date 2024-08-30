@@ -6,6 +6,7 @@ import shelter.bot.botshelter.services.AdoptionService;
 import shelter.bot.botshelter.services.ReportServiceImpl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class ReminderScheduler {
             if (reportsOptional.isPresent()) {
                 reportsToRemind = reportsOptional.get()
                         .stream()
-                        .filter(e -> e.getDate().isBefore(LocalDate.now().minusDays(1)) )
+                        .filter(e -> e.getDate().isBefore(LocalDateTime.now().minusDays(1)) )
                         .toList();
                 while (reportsToRemind.iterator().hasNext()) {
 

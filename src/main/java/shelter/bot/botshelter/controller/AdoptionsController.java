@@ -10,7 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelter.bot.botshelter.model.Adoptions;
+import shelter.bot.botshelter.model.Animal;
+import shelter.bot.botshelter.model.Client;
+import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.AdoptionService;
+import shelter.bot.botshelter.services.AnimalService;
+import shelter.bot.botshelter.services.ClientService;
+import shelter.bot.botshelter.services.ShelterService;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +29,25 @@ import java.util.Optional;
 @Tag(name = "Adoptions",description = "API для работы с усыновлениями")
 public class AdoptionsController {
     private final AdoptionService service;
+    private final ClientService clientService;
+    private final AnimalService animalService;
 
-    public AdoptionsController(AdoptionService service) {
+    public AdoptionsController(AdoptionService service, ClientService clientService, AnimalService animalService) {
         this.service = service;
+        this.clientService = clientService;
+        this.animalService = animalService;
     }
 
     /**
+
+     *
+             * @param adoptions объект сущности (@code Adoptions).Хранит необходимые данные о усыновлениях
+     */
+    /**
      * Эндпоинт добавляет усыновление в базу данных. Принимает объект класса (@code Adoptions) <br>
      * , куда входят все необходимые его данные для связи с ним
-     *
-     * @param adoptions объект сущности (@code Adoptions).Хранит необходимые данные о усыновлениях
+     * @param chatId - id чата клиента
+     * @param animalId - id питомца
      */
 
     @Operation(summary = "Добавление данных об усыновлениях",
@@ -45,13 +60,24 @@ public class AdoptionsController {
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
             })
-    @PostMapping
-    public ResponseEntity<Adoptions> addAdoptions(@RequestBody Adoptions adoptions) {
+    @PostMapping("addAdoption/{chatId}/{animalId}")
+    public ResponseEntity<Adoptions> addAdoptions(@PathVariable Long chatId,
+                                                  @PathVariable Long animalId) {
 
-        if (adoptions == null) {
-            return ResponseEntity.badRequest().build();
+        Optional<Animal> animalOptional = animalService.findById(animalId);
+        Optional<Client> clientOptional = clientService.findByChatId(chatId);
+        Animal animal;
+        Client client;
+        if (clientOptional.isPresent()) {
+            client = clientOptional.get();
+        }else{
+            return ResponseEntity.notFound().header("Клиент не найден").build();}
+        if (animalOptional.isPresent()) {
+            animal = animalOptional.get();
+        }else{
+            return ResponseEntity.notFound().header("Питомец не найден").build();
         }
-        return ResponseEntity.ok(service.add(adoptions));
+        return ResponseEntity.ok(service.add(new Adoptions(animal, client)));
     }
 
     /**
@@ -77,6 +103,31 @@ public class AdoptionsController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(service.edit(adoptions));
+    }
+
+    /**
+     *  Эндпоит позволяет выставить результат подотчетного периода для усыновления
+     * @param adoptionId - id усыновления
+     * @param result - код результа(1 - прошел/ 2 - не прошел)
+     */
+    @Operation(summary = "Выставление результата подотчетного периода",
+            description = "Метод для выставления результат подотчетного периода",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Усыновление успешно изменено"),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Усыновление не найдено", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
+    @PutMapping("/setResult/{adoptionId}/{result}")
+    public ResponseEntity<Adoptions> putAdoptionsSetReviewed(@PathVariable Long adoptionId,@PathVariable Integer result) {
+        Optional<Adoptions> byId = service.findById(adoptionId);
+        if (!byId.isPresent()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Adoptions adoptions = byId.get();
+            adoptions.setResult(1);
+            return ResponseEntity.ok(service.edit(adoptions));
+        }
     }
 
     /**

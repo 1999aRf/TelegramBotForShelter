@@ -4,7 +4,6 @@
 
 CREATE TABLE reports(
 id SERIAL PRIMARY KEY,
-animal_id BIGINT references clients(id),
 date timestamp,
 photo BYTEA,
 diet text,
