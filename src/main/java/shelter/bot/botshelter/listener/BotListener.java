@@ -3,12 +3,9 @@ package shelter.bot.botshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -20,8 +17,6 @@ import shelter.bot.botshelter.model.Menu;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 @Component

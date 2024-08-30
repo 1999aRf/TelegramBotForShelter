@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import shelter.bot.botshelter.model.Volunteer;
 
 @Repository
-public interface VolunteerRepository extends JpaRepository<Volunteer,Long> {
+public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
 }

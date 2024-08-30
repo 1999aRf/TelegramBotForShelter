@@ -8,12 +8,13 @@ import shelter.bot.botshelter.services.ClientService;
 
 import java.util.List;
 import java.util.Optional;
+
 /**
-*Обработчик запросов к таблице БД сущности {@code Client}
-*/
+ * Обработчик запросов к таблице БД сущности {@code Client}
+ */
 @RestController
 @RequestMapping("api/clients")
-@Tag(name = "Client",description = "API для работы с клиентами")
+@Tag(name = "Client", description = "API для работы с клиентами")
 public class ClientController {
     private final ClientService clientService;
 

@@ -1,4 +1,5 @@
 package shelter.bot.botshelter.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import shelter.bot.botshelter.services.ShelterService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
 /**
  * Контроллер для управления приютами.
  * Обрабатывает запросы на создание, обновление, удаление и получение информации о приютах.
@@ -99,7 +101,7 @@ public class ShelterController {
      * @return Статус ответа с URL загруженного файла.
      */
     @Operation(summary = "Загрузить схему проезда", description = "Загружает изображение схемы проезда для приюта и возвращает URL файла.")
-    @PostMapping(value = "/{id}/uploadMap",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{id}/uploadMap", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadRouteMap(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             // Проверяем существование приюта по ID

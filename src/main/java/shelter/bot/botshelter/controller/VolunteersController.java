@@ -134,7 +134,7 @@ public class VolunteersController {
     @Operation(summary = "Удаление волонтера",
             description = "Метод для удаления волонтера из БД по id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Волонтер удален из списка",content = @Content),
+                    @ApiResponse(responseCode = "200", description = "Волонтер удален из списка", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Волонтеры не найдены", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)

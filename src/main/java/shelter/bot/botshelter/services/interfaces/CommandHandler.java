@@ -1,15 +1,7 @@
 package shelter.bot.botshelter.services.interfaces;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.response.GetFileResponse;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 public interface CommandHandler {
@@ -77,55 +69,55 @@ public interface CommandHandler {
     //--------------------------------------------------------------------------
     //              Наборы кнопок для соответствующего в названии меню
     //--------------------------------------------------------------------------
-    public static final String[][] CHOOSE_SHELTER_COMMANDS = new String [][] {
+    public static final String[][] CHOOSE_SHELTER_COMMANDS = new String[][]{
             new String[]{CHOOSE_SHELTER_COMMAND1},
             new String[]{CHOOSE_SHELTER_COMMAND2}
     };
 
     public static final String[][] MAIN_MENU_COMMANDS = new String[][]{
-            new String [] {MAIN_COMMAND1},
-            new String [] {MAIN_COMMAND2},
-            new String [] {MAIN_COMMAND3},
+            new String[]{MAIN_COMMAND1},
+            new String[]{MAIN_COMMAND2},
+            new String[]{MAIN_COMMAND3},
 //            new String [] {CHOSE_MENU},
-            new String [] {CALL_VOLUNTEER}
+            new String[]{CALL_VOLUNTEER}
     };
     public static final String[][] SUBMENU_NEW_USER = new String[][]{
-            new String [] {NEW_USER_COMMAND1},
-            new String [] {NEW_USER_COMMAND2},
-            new String [] {NEW_USER_COMMAND3},
-            new String [] {NEW_USER_COMMAND4},
-            new String [] {MAIN_MENU},
-            new String [] {CALL_VOLUNTEER}
+            new String[]{NEW_USER_COMMAND1},
+            new String[]{NEW_USER_COMMAND2},
+            new String[]{NEW_USER_COMMAND3},
+            new String[]{NEW_USER_COMMAND4},
+            new String[]{MAIN_MENU},
+            new String[]{CALL_VOLUNTEER}
     };
     public static final String[][] SUBMENU_CONSULTATION = new String[][]{
-            new String [] {CONSULTATION_COMMAND1},
-            new String [] {CONSULTATION_COMMAND2},
-            new String [] {CONSULTATION_COMMAND3},
-            new String [] {CONSULTATION_COMMAND4},
-            new String [] {NEW_USER_MENU},
+            new String[]{CONSULTATION_COMMAND1},
+            new String[]{CONSULTATION_COMMAND2},
+            new String[]{CONSULTATION_COMMAND3},
+            new String[]{CONSULTATION_COMMAND4},
+            new String[]{NEW_USER_MENU},
     };
     public static final String[][] SUBMENU_DOG_HANDLER = new String[][]{
-            new String [] {DOG_HANDLER_COMMAND1},
-            new String [] {DOG_HANDLER_COMMAND2},
-            new String [] {DOG_HANDLER_COMMAND3},
-            new String [] {CONSULTATION_MENU},
-            new String [] {CALL_VOLUNTEER}
+            new String[]{DOG_HANDLER_COMMAND1},
+            new String[]{DOG_HANDLER_COMMAND2},
+            new String[]{DOG_HANDLER_COMMAND3},
+            new String[]{CONSULTATION_MENU},
+            new String[]{CALL_VOLUNTEER}
     };
 
     public static final String[][] SUBMENU_ADOPTION = new String[][]{
-            new String [] {ADOPTION_COMMAND1},
-            new String [] {ADOPTION_COMMAND2},
-            new String [] {ADOPTION_COMMAND3},
-            new String [] {ADOPTION_COMMAND4},
-            new String [] {DOG_HANDLER_MENU},
-            new String [] {MAIN_MENU}
+            new String[]{ADOPTION_COMMAND1},
+            new String[]{ADOPTION_COMMAND2},
+            new String[]{ADOPTION_COMMAND3},
+            new String[]{ADOPTION_COMMAND4},
+            new String[]{DOG_HANDLER_MENU},
+            new String[]{MAIN_MENU}
     };
     public static final String[][] SUBMENU_REPORT = new String[][]{
-            new String [] {REPORT_COMMAND1},
-            new String [] {REPORT_COMMAND2},
-            new String [] {REPORT_COMMAND3},
-            new String [] {REPORT_COMMAND4},
-            new String [] {MAIN_MENU}
+            new String[]{REPORT_COMMAND1},
+            new String[]{REPORT_COMMAND2},
+            new String[]{REPORT_COMMAND3},
+            new String[]{REPORT_COMMAND4},
+            new String[]{MAIN_MENU}
     };
 
     //--------------------------------------------------------------------------
@@ -142,12 +134,12 @@ public interface CommandHandler {
      * - возврат к меню выбора интересующего животного {@code CHOSE_MENU}<br>
      * - позвать волонтера {@code CALL_VOLUNTEER}.
      *
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
+     * @param chatId  - идентификатор чата(при взаимодействии с пользователем он
+     *                сохраняется вместе с его выбором интересующего приюта для выдачи
+     *                актуальной для него информации в следующих меню)
      * @param command - текущая команда, которую отправил пользователь
      */
-    void handleMainCommands(Long chatId,String command);
+    void handleMainCommands(Long chatId, String command);
 
 
     /**
@@ -159,12 +151,13 @@ public interface CommandHandler {
      * - общие сведения о технике безопасности{@code NEW_USER_COMMAND3},<br>
      * - принять данные для связи {@code NEW_USER_COMMAND4},<br>
      * - возврат в главное меню {@code MAIN_MENU}
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
+     *
+     * @param chatId  - идентификатор чата(при взаимодействии с пользователем он
+     *                сохраняется вместе с его выбором интересующего приюта для выдачи
+     *                актуальной для него информации в следующих меню)
      * @param command - текущая команда, которую отправил пользователь
      */
-    void handleNewUserCommands(Long chatId,String command);
+    void handleNewUserCommands(Long chatId, String command);
 
     /**
      * Обработчик команд меню, в котором пользователь получает информацию для будущего усыновителя
@@ -175,12 +168,12 @@ public interface CommandHandler {
      * - рекомендации(для тех, кто хочет усыновить собаку) {@code CONSULTATION_COMMAND4},<br>
      * - возврат в меню для нового пользователя {@code NEW_USER_MENU}
      *
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
+     * @param chatId  - идентификатор чата(при взаимодействии с пользователем он
+     *                сохраняется вместе с его выбором интересующего приюта для выдачи
+     *                актуальной для него информации в следующих меню)
      * @param command - текущая команда, которую отправил пользователь
      */
-    void handleConsultationCommands(Long chatId,String command);
+    void handleConsultationCommands(Long chatId, String command);
 
     /**
      * Обработчик команд меню, в котором пользователь получает рекомендации уже как усыновившему :<br>
@@ -191,12 +184,12 @@ public interface CommandHandler {
      * - возврат в меню консультации {@code CONSULTATION_MENU},<br>
      * - вызов волонтера{@code CALL_VOLUNTEER}
      *
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
+     * @param chatId  - идентификатор чата(при взаимодействии с пользователем он
+     *                сохраняется вместе с его выбором интересующего приюта для выдачи
+     *                актуальной для него информации в следующих меню)
      * @param command - текущая команда, которую отправил пользователь
      */
-    void handleDogHandlerCommands(Long chatId,String command);
+    void handleDogHandlerCommands(Long chatId, String command);
 
     /**
      * Обработчик команд меню, в котором усыновивший животное пользователь получает рекомендации:<br>
@@ -206,12 +199,13 @@ public interface CommandHandler {
      * - обустройство дома для питомца с ограниченными возможностями{@code ADOPTION_COMMAND4},<br>
      * - возврат в главное меню{@code MAIN_MENU}.
      *
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
+     * @param chatId  - идентификатор чата(при взаимодействии с пользователем он
+     *                сохраняется вместе с его выбором интересующего приюта для выдачи
+     *                актуальной для него информации в следующих меню)
      * @param command - текущая команда, которую отправил пользователь
      */
-    void handleAdoptionCommands(Long chatId,String command);
+    void handleAdoptionCommands(Long chatId, String command);
+
     /**
      * Обработчик команд меню отчета, в котором пользователь, усыновивший питомца обязан отправлять достоверную
      * информацию о: <br>
@@ -221,18 +215,18 @@ public interface CommandHandler {
      * - фото-отчет{@code REPORT_COMMAND4},<br>
      * - возврат в главное меню{@code MAIN_MENU}.
      *
-     *
      * @param message - все содержимое сообщения
      */
     void handleReportCommands(Message message);
 
     /**
      * Метод проверяет, есть ли команда в соответствуюем меню.
+     *
      * @param buttonsArray - набор кнопок меню
-     * @param command - команда, к которой ищет соответствие в разных наборах кнопок.
+     * @param command      - команда, к которой ищет соответствие в разных наборах кнопок.
      * @return - {@code true}- если есть, {@code false} - если нет такой команды
      */
-    default boolean checkContains(String[][] buttonsArray,String command){
+    default boolean checkContains(String[][] buttonsArray, String command) {
         if (command.equals(CALL_VOLUNTEER)) {
             return false;
         }
@@ -250,18 +244,20 @@ public interface CommandHandler {
 
     /**
      * Метод для обработки команды {@code NEW_USER_COMMAND4} - принять данные для связи.
+     *
      * @param message - все содержимое сообщения
      */
     void handleUserText(Message message);
+
     /**
      * Метод валидации номера согласно маске {@code validNumber}
+     *
      * @param command - введенный текст пользователя
      * @return - {@code true}, если текст пользователя соответствует маске
      */
     default boolean validateNumber(String command) {
         return validNumber.matcher(command).matches();
     }
-
 
 
 }

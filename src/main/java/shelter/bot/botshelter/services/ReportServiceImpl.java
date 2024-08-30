@@ -9,7 +9,6 @@ import shelter.bot.botshelter.repositories.AdoptionRepository;
 import shelter.bot.botshelter.repositories.ReportRepository;
 import shelter.bot.botshelter.services.interfaces.ReportService;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

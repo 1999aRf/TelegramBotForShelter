@@ -165,23 +165,17 @@ public class CommandHandlerService implements CommandHandler {
         logger.info("Обработчик команд для пользователя запущен для чата: {}",chatId);
         switch (command) {
             case NEW_USER_COMMAND1:
-
                 Shelter shelter = shelterService.getShelterById(1L).get();
                 sendMessage(chatId, SHElTER_DOG_INFO);
                 menu.sendMenu(chatId,
                         "Расписание: " + shelter.getBusinessTime(),
                         SUBMENU_NEW_USER,
                         bot);
-
-
                 break;
+
             case NEW_USER_COMMAND2:
-
-
                 sendShelterInfo(chatId, shelterService.getShelterById(1L).get());
                 menu.sendMenu(chatId, "Можем вам предложить", SUBMENU_NEW_USER, bot);
-
-
                 break;
 
             case NEW_USER_COMMAND3:
@@ -247,6 +241,7 @@ public class CommandHandlerService implements CommandHandler {
             case DOG_HANDLER_COMMAND1:
                 sendMessage(chatId, DOG_HANDLERS_RECOMMENDATIONS);
                 break;
+
             case DOG_HANDLER_COMMAND2:
                 sendMessage(chatId, DOG_HANDLER_LIST);
                 break;
@@ -254,6 +249,7 @@ public class CommandHandlerService implements CommandHandler {
             case DOG_HANDLER_COMMAND3:
                 sendMessage(chatId, REASONS_FOR_REFUSAL);
                 break;
+
             case CONSULTATION_MENU:
                 menu.sendMenu(chatId,
                         CONSULTATION_MENU,
@@ -270,11 +266,10 @@ public class CommandHandlerService implements CommandHandler {
         switch (command) {
             case ADOPTION_COMMAND1:
                 sendMessage(chatId, RULES_ANIMAL_TRANSPORTATION);
-
                 break;
+
             case ADOPTION_COMMAND2:
                 sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_PUPPY);
-
                 break;
 
             case ADOPTION_COMMAND3:
@@ -284,19 +279,20 @@ public class CommandHandlerService implements CommandHandler {
             case ADOPTION_COMMAND4:
                 sendMessage(chatId, APARTMENT_PREPARATIONS_FOR_DISABLED);
                 break;
+
             case DOG_HANDLER_MENU:
                 menu.sendMenu(chatId,
                         DOG_HANDLER_MENU,
                         SUBMENU_DOG_HANDLER,
                         bot);
                 break;
+
             case MAIN_MENU:
                 menu.sendMenu(chatId,
                         MAIN_MENU,
                         MAIN_MENU_COMMANDS,
                         bot);
                 break;
-
         }
     }
 
@@ -343,6 +339,7 @@ public class CommandHandlerService implements CommandHandler {
                 } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND3)) {
                     handleReportCommand3(chatId, command);
                 } else if (prevCommand != null && !prevCommand.isEmpty() && prevCommand.equals(REPORT_COMMAND4)) {
+
                     try {
                         handleReportCommand4(message);
                     } catch (DownloadPhotoException ex) {

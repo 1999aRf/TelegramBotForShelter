@@ -11,7 +11,6 @@ import java.util.Optional;
  * Класс предназначен для получения необходимых данных из БД посредством {@code VolunteerRepository}
  *
  * @author KhasanovTR
- *
  */
 @Service
 public class VolunteerService {
@@ -24,6 +23,7 @@ public class VolunteerService {
 
     /**
      * Добавляет волонтера в БД
+     *
      * @param volunteer - объект класса {@code Volunteer}
      * @return объект класса {@code Volunteer}
      */
@@ -33,6 +33,7 @@ public class VolunteerService {
 
     /**
      * Ищет волонтера по id
+     *
      * @param id - идентификатор волонтера в БД
      * @return объект класса {@code Volunteer}
      */
@@ -42,6 +43,7 @@ public class VolunteerService {
 
     /**
      * Редактирует данные о волонтере в БД
+     *
      * @param volunteer - объект класса {@code Volunteer}
      * @return объект класса {@code Volunteer}
      */
@@ -51,6 +53,7 @@ public class VolunteerService {
 
     /**
      * Удаляет данные о волонтере из БД
+     *
      * @param id - идентификатор волонтера в БД
      */
     public void delete(Long id) {
@@ -59,6 +62,7 @@ public class VolunteerService {
 
     /**
      * Возвращает список всех волонтеров
+     *
      * @return - список волонтеров(может быть null)
      */
     public Optional<List<Volunteer>> findAll() {

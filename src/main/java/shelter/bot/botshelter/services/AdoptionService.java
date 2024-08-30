@@ -5,7 +5,6 @@ import shelter.bot.botshelter.model.Adoptions;
 import shelter.bot.botshelter.model.Report;
 import shelter.bot.botshelter.repositories.AdoptionRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

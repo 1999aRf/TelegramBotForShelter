@@ -24,7 +24,7 @@ public class ReportController {
         return ResponseEntity.ok(unreviewedReports);
     }
 
-    @PostMapping(value = "/{reportId}/submit",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{reportId}/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> submitReport(@PathVariable Long reportId,
                                                @RequestParam("photo") MultipartFile photo,
                                                @RequestParam("diet") String diet,

@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("api/adoptions")
-@Tag(name = "Adoptions",description = "API для работы с усыновлениями")
+@Tag(name = "Adoptions", description = "API для работы с усыновлениями")
 public class AdoptionsController {
     private final AdoptionService service;
 
@@ -130,7 +130,7 @@ public class AdoptionsController {
     @Operation(summary = "Удаление усыновления",
             description = "Метод для удаления усыновления из БД по id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Усыновление удалено из списка",content = @Content),
+                    @ApiResponse(responseCode = "200", description = "Усыновление удалено из списка", content = @Content),
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Усыновления не найдены", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)

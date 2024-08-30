@@ -1,8 +1,10 @@
 package shelter.bot.botshelter.services;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.repositories.ShelterRepository;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+
 /**
  * Сервис для управления приютами.
  */
@@ -57,7 +60,7 @@ public class ShelterService {
     /**
      * Обновить существующий приют.
      *
-     * @param id      Идентификатор приюта.
+     * @param id             Идентификатор приюта.
      * @param shelterDetails Обновленные данные приюта.
      * @return Обновленный приют, если обновление успешно.
      */

@@ -6,19 +6,19 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name="clients")
+@Table(name = "clients")
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "chat_id",nullable = false, unique = true)
+    @Column(name = "chat_id", nullable = false, unique = true)
     private Long chatId;
 
-    @Column(name = "client_name",nullable = true)
+    @Column(name = "client_name", nullable = true)
     private String clientName;
 
-    @Column(name = "contact_number",nullable = true, unique = true)
+    @Column(name = "contact_number", nullable = true, unique = true)
     private String contactNumber;
 
     @OneToMany(mappedBy = "client")

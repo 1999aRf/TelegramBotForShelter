@@ -12,13 +12,13 @@ public class Volunteer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-        @Column(name = "chat_id", nullable = false)
+    @Column(name = "chat_id", nullable = false)
     private long chat_id;
 
-        @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-       @Column(name = "contacts", nullable = true)
+    @Column(name = "contacts", nullable = true)
     private String contacts;
 
     public Volunteer(long chat_id, String name, String contacts) {
@@ -68,7 +68,6 @@ public class Volunteer {
     public void setContacts(String contacts) {
         this.contacts = contacts;
     }
-
 
 
     @Override

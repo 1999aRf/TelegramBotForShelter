@@ -1,23 +1,26 @@
 package shelter.bot.botshelter.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
+
 import java.util.List;
 import java.util.Objects;
+
 /**
  * Сущность, представляющая приют.
  */
 @Entity
-@Table(name="shelters")
+@Table(name = "shelters")
 public class Shelter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "chat_id",nullable = false, unique = true)
+    @Column(name = "chat_id", nullable = false, unique = true)
     private Long chatId;
-    @Column(name = "client_name",nullable = true)
+    @Column(name = "client_name", nullable = true)
     private String clientName;
-    @Column(name = "contact_number",nullable = true, unique = true)
+    @Column(name = "contact_number", nullable = true, unique = true)
     @Pattern(regexp = "^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$", message = "Неверный формат номера телефона")
     private String contactNumber;
     @Column(name = "business_time")
@@ -79,39 +82,51 @@ public class Shelter {
     public String getRouteMapUrl() {
         return routeMapUrl;
     }
+
     public void setRouteMapUrl(String routeMapUrl) {
         this.routeMapUrl = routeMapUrl;
     }
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getChatId() {
         return chatId;
     }
+
     public void setChatId(Long chatId) {
         this.chatId = chatId;
     }
+
     public String getClientName() {
         return clientName;
     }
+
     public void setClientName(String clientName) {
         this.clientName = clientName;
     }
+
     public String getContactNumber() {
         return contactNumber;
     }
+
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
+
     public List<Animal> getAvailableAnimals() {
         return availableAnimals;
     }
+
     public void setAvailableAnimals(List<Animal> availableAnimals) {
         this.availableAnimals = availableAnimals;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -123,10 +138,12 @@ public class Shelter {
                 Objects.equals(contactNumber, shelter.contactNumber) &&
                 Objects.equals(routeMapUrl, shelter.routeMapUrl);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, chatId, clientName, contactNumber, routeMapUrl);
     }
+
     @Override
     public String toString() {
         return "Shelter{" +
