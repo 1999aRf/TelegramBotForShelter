@@ -233,7 +233,7 @@ public interface CommandHandler {
      * @return - {@code true}- если есть, {@code false} - если нет такой команды
      */
     default boolean checkContains(String[][] buttonsArray,String command){
-        if (command==null) {
+        if (command==null||command.equals(CALL_VOLUNTEER)) {
             return false;
         }
         for (int i = 0; i < buttonsArray.length; i++) {

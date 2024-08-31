@@ -1,5 +1,11 @@
 package shelter.bot.botshelter.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +29,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reports")
+@Tag(name = "Reports")
 public class ReportController {
     private final ReportServiceImpl reportService;
     private final AnimalService animalService;
@@ -33,12 +40,33 @@ public class ReportController {
         this.animalService = animalService;
         this.adoptionService = adoptionService;
     }
-
-    @GetMapping("/unreviewed")
+@Operation(summary = "Список непросмотренных отчетов",
+description = "Метод для выдачи списка непросмотренных отчетов",
+responses = {
+        @ApiResponse(responseCode = "200", description = "Выдан список непросмотренных отчетов",
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = Report.class))),
+        @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+        @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+})
+@GetMapping("/unreviewed")
     public ResponseEntity<List<Report>> getUnreviewedReports() {
         List<Report> unreviewedReports = reportService.getUnreviewedReports();
         return ResponseEntity.ok(unreviewedReports);
     }
+
+
+    @Operation(summary = "Добавить отчет",
+            description = "Метод добавления отчета",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Отчет успешно добавлен",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Report.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
 
     @PostMapping(value = "/{reportId}/{adoptionId}/submit",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> submitReport(@PathVariable Long reportId,
@@ -70,6 +98,17 @@ public class ReportController {
         return ResponseEntity.ok().body("Daily report submitted successfully.");
     }
 
+    @Operation(summary = "Отметить отчет просмотренным ",
+            description = "Метод редактирования отчета и пометки его как прочитанного",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Отчет успешно просмотрен",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Report.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
+
     @PostMapping(value = "/{reportId}/setReviewed")
     public ResponseEntity<String> setReviewed(@PathVariable Long reportId) {
         Optional<Report> report = reportService.getReportById(reportId);
@@ -81,6 +120,18 @@ public class ReportController {
 
     }
 
+    @Operation(summary = "Получить отчет с БД ",
+            description = "Метод получения отчета по его id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Отчет успешно получен",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Report.class))),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
+
+
     @GetMapping(value = "/{reportId}")
     public ResponseEntity<Report> getReportById(@PathVariable Long reportId) {
         Report report = reportService.getReportById(reportId)
@@ -88,6 +139,17 @@ public class ReportController {
 
         return ResponseEntity.ok(report);
     }
+
+    @Operation(summary = "Получить фото с отчета БД ",
+            description = "Метод получения фото отчета по его id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Фото успешно получено",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    array = @ArraySchema(schema = @Schema(implementation = Byte.class)))),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
     @GetMapping(value = "/getPhoto/{reportId}")
     private ResponseEntity<byte[]> getPhoto(@PathVariable Long reportId) {
         Report report = reportService.getReportById(reportId)
@@ -98,6 +160,15 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(report.getPhoto());
     }
 
+    @Operation(summary = "Отправить напоминание ",
+            description = "Метод отправки напоминания отправителю отчета по его id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Напоминае успешно отправлено",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
+            })
     @PostMapping("/{reportId}/sendWarning")
     public ResponseEntity<Void> sendWarning(@PathVariable Long reportId) {
         reportService.sendWarning(reportId);

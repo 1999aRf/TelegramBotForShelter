@@ -156,13 +156,7 @@ public class CommandHandlerService implements CommandHandler {
             case MAIN_COMMAND4:
 
                 break;
-            case CHOSE_MENU:
-                menu.sendMenu(chatId,
-                        "Какое животное желаете приютить?",
-                        CHOOSE_SHELTER_COMMANDS,
-                        bot);
-                prevCommand = CHOSE_MENU;
-                break;
+
         }
 
     }
@@ -371,18 +365,27 @@ public class CommandHandlerService implements CommandHandler {
             Optional<List<Adoptions>> byProbationPeriodLessNow = adoptionService.findByProbationPeriodLessNow();
             if (byProbationPeriodLessNow.isEmpty()) {
                 menu.sendMenu(chatId,
-                        "У вас нет действующих усыновлений",
+                        "У вас нет усыновлений с действующим подотчетным периодом",
                         MAIN_MENU_COMMANDS,
                         bot);
                 return;
             }
             List<Adoptions> adoptionListForThisClient = byProbationPeriodLessNow.get().stream().filter(e -> Objects.equals(e.getClient().getChatId(), chatId)).toList();
-            // используется только одно усыновление
-            adoption = adoptionListForThisClient.get(0);
-            report = new Report();
-            report.setDiet(command);
-            logger.info("Отчет о питании успешно сохранен");
-            sendMessage(chatId,"Отчет о питании успешно сохранен. Выберете следующий пункт меню");
+            if (adoptionListForThisClient.isEmpty()) {
+                menu.sendMenu(chatId,
+                        "У вас нет действующих усыновлений",
+                        MAIN_MENU_COMMANDS,
+                        bot);
+                return;
+            } else {
+                // используется только одно усыновление
+                adoption = adoptionListForThisClient.get(0);
+                report = new Report();
+                report.setDiet(command);
+                logger.info("Отчет о питании успешно сохранен");
+                sendMessage(chatId,"Отчет о питании успешно сохранен. Выберете следующий пункт меню");
+            }
+
         } else {
             menu.sendMenu(chatId,
                     "Нажмите еще раз на кнопку меню " + REPORT_COMMAND1 + " и введите отчет о питании питомца" +
