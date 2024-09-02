@@ -3,9 +3,12 @@ package shelter.bot.botshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -14,14 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import shelter.bot.botshelter.configuration.TelegramBotConfiguration;
 import shelter.bot.botshelter.model.Menu;
-import shelter.bot.botshelter.model.Shelter;
 import shelter.bot.botshelter.services.ClientService;
 import shelter.bot.botshelter.services.CommandHandlerService;
 
-
-import static shelter.bot.botshelter.model.Menu.*;
-
-import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -35,6 +35,7 @@ public class BotListener implements UpdatesListener {
     private final Menu menu;
 
     private ClientService clientService;
+
 
     @Autowired
     private TelegramBotConfiguration configuration;
@@ -66,25 +67,16 @@ public class BotListener implements UpdatesListener {
 
     private void processUpdate(Update update) {
         logger.info("Processing update: {}", update);
-
-        Long chatId = update.message().chat().id();
-        String text = update.message().text();
-        commandHandlerService.handleCommand(chatId,text);
+        Message message = update.message();
+            commandHandlerService.handleCommand(message);
     }
 
-    public void sendShelterInfo(Long chatId, Shelter shelter) {
-        SendMessage message = new SendMessage(chatId, "Информация о приюте:\n" +
-                "Название: " + shelter.getClientName() + "\n" +
-                "Контактный номер: " + shelter.getContactNumber());
-
-        // Отправляем текстовое сообщение с информацией
-        telegramBot.execute(message);
-
-        // Если есть схема проезда, отправляем её как фото
-        if (shelter.getRouteMapUrl() != null) {
-            SendPhoto sendPhoto = new SendPhoto(chatId, new File(shelter.getRouteMapUrl()));
-            sendPhoto.caption("Схема проезда к приюту");
-            telegramBot.execute(sendPhoto);
+    private void sendMessage(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        SendResponse response = telegramBot.execute(sendMessage);
+        if (!response.isOk()) {
+            logger.error("Error during sending message: {}", response.description());
         }
     }
+
 }

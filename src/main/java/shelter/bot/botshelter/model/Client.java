@@ -2,6 +2,7 @@ package shelter.bot.botshelter.model;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -20,10 +21,13 @@ public class Client {
     @Column(name = "contact_number",nullable = true, unique = true)
     private String contactNumber;
 
-    public Client(Long chatId, String clientName, String contactNumber) {
+    @OneToMany(mappedBy = "client")
+    private Collection<Adoptions> adoptions;
+
+
+    public Client(Long chatId, String clientName) {
         this.chatId = chatId;
         this.clientName = clientName;
-        this.contactNumber = contactNumber;
     }
 
     public Client(Long chatId) {
@@ -32,9 +36,6 @@ public class Client {
 
     public Client() {
     }
-    // на будущее, сразу создал для питомцев.
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Pet> adoptedPets;
 
     public Long getId() {
         return id;

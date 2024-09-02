@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset pupuskjaer:2
+-- changeset pupuskjaer:1
 
 CREATE TABLE clients(
 id SERIAL PRIMARY KEY,

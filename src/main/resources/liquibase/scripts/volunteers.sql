@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset pupuskjaer:1
+-- changeset pupuskjaer:3
 
 CREATE TABLE volunteers(
 id SERIAL PRIMARY KEY,

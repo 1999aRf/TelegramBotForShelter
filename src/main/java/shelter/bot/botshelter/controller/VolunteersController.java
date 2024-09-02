@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("api/volunteers")
+@Tag(name = "Volunteer", description = "API для работы с волонтерами")
 public class VolunteersController {
 
     private final VolunteerService service;
@@ -97,8 +99,7 @@ public class VolunteersController {
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Волонтер не найден", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
-            },
-            tags = "Volunteer")
+            })
     @GetMapping("/{id}")
     public ResponseEntity<Volunteer> findById(@PathVariable Long id) {
         Optional<Volunteer> volunteer = service.findById(id);
@@ -118,8 +119,7 @@ public class VolunteersController {
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Волонтеры не найдены", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
-            },
-    tags = "Volunteer")
+            })
     @GetMapping("/getAll")
     public ResponseEntity<List<Volunteer>> findAll() {
         Optional<List<Volunteer>> optional = service.findAll();
@@ -138,8 +138,7 @@ public class VolunteersController {
                     @ApiResponse(responseCode = "400", description = "Некорректные входные данные", content = @Content),
                     @ApiResponse(responseCode = "404", description = "Волонтеры не найдены", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Ошибка на сервере", content = @Content)
-            },
-            tags = "Volunteer")
+            })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

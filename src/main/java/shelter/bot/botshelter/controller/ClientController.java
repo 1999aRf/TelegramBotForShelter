@@ -1,5 +1,6 @@
 package shelter.bot.botshelter.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shelter.bot.botshelter.model.Client;
@@ -12,6 +13,7 @@ import java.util.Optional;
 */
 @RestController
 @RequestMapping("api/clients")
+@Tag(name = "Client",description = "API для работы с клиентами")
 public class ClientController {
     private final ClientService clientService;
 

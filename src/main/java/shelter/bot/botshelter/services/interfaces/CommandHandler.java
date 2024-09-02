@@ -1,11 +1,22 @@
 package shelter.bot.botshelter.services.interfaces;
 
-import java.util.ArrayList;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.response.GetFileResponse;
+
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public interface CommandHandler {
 
+    // паттерн для валидации номера формата +7-9**-***-**-
+
+    Pattern validNumber = Pattern.compile("^\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}$");
     //--------------------------------------------------------------------------
     //    Маркеры выбора интересующего набора приютов с кошками или собаками
     //--------------------------------------------------------------------------
@@ -19,6 +30,8 @@ public interface CommandHandler {
     public static final String MAIN_MENU = "Главное меню";
     public static final String NEW_USER_MENU = "О приюте";
     public static final String CONSULTATION_MENU = "Консультация";
+    public static final String RECOMMENDATION_MENU = "Рекомендации";
+    public static final String DOG_HANDLER_MENU = "Советы кинолога";
 
     //--------------------------------------------------------------------------
     //                          Базовые команды
@@ -52,9 +65,14 @@ public interface CommandHandler {
     public static final String DOG_HANDLER_COMMAND3 = "Причины отказа";
 
     public static final String ADOPTION_COMMAND1 = "Транспортировка животного";
-    public static final String ADOPTION_COMMAND2 = "Обустройство дома";
+    public static final String ADOPTION_COMMAND2 = "Обустройство дома для щенка";
     public static final String ADOPTION_COMMAND3 = "Обустройство дома для взрослого питомца";
     public static final String ADOPTION_COMMAND4 = "Обустройство дома для питомца с ограниченными возможностями";
+
+    public static final String REPORT_COMMAND1 = "Отчет о питании питомца";
+    public static final String REPORT_COMMAND2 = "Отчет о самочувствии питомца";
+    public static final String REPORT_COMMAND3 = "Отчет о поведении питомца";
+    public static final String REPORT_COMMAND4 = "Фото-отчет";
 
     //--------------------------------------------------------------------------
     //              Наборы кнопок для соответствующего в названии меню
@@ -68,7 +86,7 @@ public interface CommandHandler {
             new String [] {MAIN_COMMAND1},
             new String [] {MAIN_COMMAND2},
             new String [] {MAIN_COMMAND3},
-            new String [] {CHOSE_MENU},
+//            new String [] {CHOSE_MENU},
             new String [] {CALL_VOLUNTEER}
     };
     public static final String[][] SUBMENU_NEW_USER = new String[][]{
@@ -93,11 +111,20 @@ public interface CommandHandler {
             new String [] {CONSULTATION_MENU},
             new String [] {CALL_VOLUNTEER}
     };
+
     public static final String[][] SUBMENU_ADOPTION = new String[][]{
             new String [] {ADOPTION_COMMAND1},
             new String [] {ADOPTION_COMMAND2},
             new String [] {ADOPTION_COMMAND3},
             new String [] {ADOPTION_COMMAND4},
+            new String [] {DOG_HANDLER_MENU},
+            new String [] {MAIN_MENU}
+    };
+    public static final String[][] SUBMENU_REPORT = new String[][]{
+            new String [] {REPORT_COMMAND1},
+            new String [] {REPORT_COMMAND2},
+            new String [] {REPORT_COMMAND3},
+            new String [] {REPORT_COMMAND4},
             new String [] {MAIN_MENU}
     };
 
@@ -122,14 +149,6 @@ public interface CommandHandler {
      */
     void handleMainCommands(Long chatId,String command);
 
-    /**
-     * Обработчик выбора пользователя об интересующем его приюте(для собак или кошек)<br>
-     * @param chatId - идентификатор чата(при взаимодействии с пользователем он
-     *               сохраняется вместе с его выбором интересующего приюта для выдачи
-     *               актуальной для него информации в следующих меню)
-     * @param command - текущая команда, которую отправил пользователь
-     */
-    void handleChooseShelter(Long chatId,String command);
 
     /**
      * Обработчик команд меню, в котором пользователь может узнать различную информацию о
@@ -193,6 +212,19 @@ public interface CommandHandler {
      * @param command - текущая команда, которую отправил пользователь
      */
     void handleAdoptionCommands(Long chatId,String command);
+    /**
+     * Обработчик команд меню отчета, в котором пользователь, усыновивший питомца обязан отправлять достоверную
+     * информацию о: <br>
+     * - отчет о питании питомца{@code REPORT_COMMAND1},<br>
+     * - отчет о самочувствии питомца {@code REPORT_COMMAND2},<br>
+     * - отчет о поведении питомца{@code REPORT_COMMAND3},<br>
+     * - фото-отчет{@code REPORT_COMMAND4},<br>
+     * - возврат в главное меню{@code MAIN_MENU}.
+     *
+     *
+     * @param message - все содержимое сообщения
+     */
+    void handleReportCommands(Message message);
 
     /**
      * Метод проверяет, есть ли команда в соответствуюем меню.
@@ -201,6 +233,9 @@ public interface CommandHandler {
      * @return - {@code true}- если есть, {@code false} - если нет такой команды
      */
     default boolean checkContains(String[][] buttonsArray,String command){
+        if (command==null||command.equals(CALL_VOLUNTEER)) {
+            return false;
+        }
         for (int i = 0; i < buttonsArray.length; i++) {
             if (buttonsArray[i][0].equals(command)) {
                 return true;
@@ -209,7 +244,23 @@ public interface CommandHandler {
         return false;
     }
 
+    //--------------------------------------------------------------------------
+    //              Методы для обработки сообщений пользователя
+    //--------------------------------------------------------------------------
 
+    /**
+     * Метод для обработки команды {@code NEW_USER_COMMAND4} - принять данные для связи.
+     * @param message - все содержимое сообщения
+     */
+    void handleUserMessage(Message message);
+    /**
+     * Метод валидации номера согласно маске {@code validNumber}
+     * @param command - введенный текст пользователя
+     * @return - {@code true}, если текст пользователя соответствует маске
+     */
+    default boolean validateNumber(String command) {
+        return validNumber.matcher(command).matches();
+    }
 
 
 

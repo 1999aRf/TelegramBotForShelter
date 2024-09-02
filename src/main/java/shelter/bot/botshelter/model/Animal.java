@@ -1,7 +1,9 @@
 package shelter.bot.botshelter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -17,9 +19,13 @@ public class Animal {
     @Column(name = "species", nullable = false)
     private String species;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "shelter_id", nullable = false)
+    @JoinColumn(name = "shelter_id")
     private Shelter shelter;
+
+    @OneToMany(mappedBy = "animal")
+    private Collection<Adoptions> adoptionsCollectionTable;
 
     public Long getId() {
         return id;
@@ -71,10 +77,7 @@ public class Animal {
         return "Animal{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", species='" + species + '\'' +
-                ", shelter=" + shelter +
+                ", species='" + species + 
                 '}';
     }
-
 }
-
