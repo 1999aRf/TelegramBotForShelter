@@ -1,5 +1,7 @@
 package shelter.bot.botshelter.services;
 
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import shelter.bot.botshelter.model.Adoptions;
 import shelter.bot.botshelter.model.Report;
@@ -35,6 +37,7 @@ public class AdoptionService {
      * @param id - идентификатор усыновления в БД
      * @return объект класса {@code Adoptions}
      */
+    @Cacheable("adoptions")
     public Optional<Adoptions> findById(long id) {
         return repository.findById(id);
     }
@@ -45,6 +48,7 @@ public class AdoptionService {
      * @param adoptions - объект класса {@code Adoptions}
      * @return объект класса {@code Adoptions}
      */
+    @CachePut(value = "adoptions",key = "#adoptions.id")
     public Adoptions edit(Adoptions adoptions) {
         return repository.save(adoptions);
     }
